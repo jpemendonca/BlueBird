@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#1f6feb">
+<meta name="theme-color" content="#2f7bff">
 <title>BlueBird</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231f6feb'/%3E%3Cellipse cx='40' cy='58' rx='22' ry='18' fill='%23fff'/%3E%3Ccircle cx='55' cy='41' r='11' fill='%23fff'/%3E%3Cpath d='M64 38l10 4-10 4z' fill='%23ffc43d'/%3E%3Cpath d='M22 56L6 46l4 16z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232f7bff'/%3E%3Cellipse cx='40' cy='58' rx='22' ry='18' fill='%23fff'/%3E%3Ccircle cx='55' cy='41' r='11' fill='%23fff'/%3E%3Cpath d='M64 38l10 4-10 4z' fill='%23ffc43d'/%3E%3Cpath d='M22 56L6 46l4 16z' fill='%23fff'/%3E%3C/svg%3E">
 <style>
 :root {
   --bg: #eaf1ff; --bg2: #d3e3ff; --card: #ffffff; --card-edge: #d4e1fa; --ink: #0d1b3e; --mute: #4d628f;
   --blue: #2f7bff; --blue-2: #1f5fe0; --sky: #1f66e5; --on-blue: #ffffff; --chip: #eef3ff;
-  --green: #3ddc84; --amber: #ffc43d; --red: #d63c3c;
+  --green: #3ddc84; --amber: #ffc43d; --red: #d63c3c; --ok: #14a35a;
   --hero-1: #3a86ff; --hero-2: #2453d6;
   --shadow: 0 8px 24px rgba(31, 95, 224, .12);
   color-scheme: light;
@@ -20,74 +20,84 @@
 body { margin: 0; color: var(--ink); background: linear-gradient(180deg, var(--bg2), var(--bg) 340px) fixed, var(--bg);
   font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; min-height: 100vh; }
 main { max-width: 780px; margin: 0 auto; padding: 16px; }
-.lang-sel { margin-left: 8px; font-size: .85rem; font-weight: 600; padding: 6px 8px; }
 header { display: flex; align-items: center; gap: 12px; margin: 6px 0 18px; }
-header svg { width: 44px; height: 44px; flex: none; filter: drop-shadow(0 4px 10px rgba(47, 123, 255, .5)); }
+header svg { width: 44px; height: 44px; flex: none; filter: drop-shadow(0 4px 10px rgba(47, 123, 255, .45)); }
 header h1 { font-size: 1.5rem; margin: 0; letter-spacing: .01em; }
 header .ver { color: var(--mute); font-size: .85rem; margin-left: auto; }
+.lang-sel { font-size: .85rem; font-weight: 600; padding: 6px 8px; }
 section { background: var(--card); border: 1px solid var(--card-edge); border-radius: 18px; padding: 18px;
   margin-bottom: 14px; box-shadow: var(--shadow); }
 h2 { font-size: .85rem; margin: 0 0 12px; color: var(--sky); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
 section.hero { background: linear-gradient(135deg, var(--hero-1), var(--hero-2)); border: 0; color: #fff; position: relative; overflow: hidden; }
 section.hero::after { content: ""; position: absolute; right: -40px; top: -40px; width: 200px; height: 200px; border-radius: 50%;
   border: 18px solid rgba(255, 255, 255, .08); box-shadow: 0 0 0 26px rgba(255, 255, 255, .05); pointer-events: none; }
-section.hero h2 { color: rgba(255, 255, 255, .8); }
+section.hero h2 { color: rgba(255, 255, 255, .85); }
 .status { display: flex; gap: 14px; align-items: flex-start; position: relative; z-index: 1; }
-.dot { width: 14px; height: 14px; border-radius: 50%; margin-top: 9px; flex: none; background: rgba(255, 255, 255, .45); }
+.dot { width: 14px; height: 14px; border-radius: 50%; margin-top: 9px; flex: none; background: rgba(255, 255, 255, .5); }
 .dot.ok { background: var(--green); box-shadow: 0 0 0 6px rgba(61, 220, 132, .25); }
 .dot.busy { background: var(--amber); animation: pulse 1s infinite; }
-.dot.err { background: var(--red); }
+.dot.err { background: #ff8a8a; }
 @keyframes pulse { 50% { opacity: .35; } }
-.big { font-size: 1.55rem; font-weight: 700; line-height: 1.2; }
-.sub { color: rgba(255, 255, 255, .85); margin-top: 4px; }
-.err-text { margin-top: 8px; background: rgba(0, 0, 0, .22); border-radius: 10px; padding: 8px 12px; }
+.big { font-size: 1.55rem; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.sub { color: rgba(255, 255, 255, .88); margin-top: 4px; }
+.err-text { margin-top: 8px; background: rgba(0, 0, 0, .2); border-radius: 10px; padding: 8px 12px; }
+.tip { margin-top: 12px; font-size: .9rem; color: rgba(255, 255, 255, .85); position: relative; z-index: 1; }
 .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; position: relative; z-index: 1; }
 button { font: inherit; font-weight: 600; border: 1px solid var(--card-edge); background: var(--chip); color: var(--ink);
   border-radius: 12px; padding: 10px 18px; cursor: pointer; transition: transform .08s, filter .15s; }
-button:hover { filter: brightness(1.08); }
+button:hover { filter: brightness(1.04); }
 button:active { transform: scale(.97); }
 button.primary { background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: var(--on-blue); border-color: transparent;
-  box-shadow: 0 6px 16px rgba(47, 123, 255, .35); }
+  box-shadow: 0 6px 16px rgba(47, 123, 255, .3); }
 button.danger { color: var(--red); }
-button.light { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .3); color: #fff; }
+button.light { background: rgba(255, 255, 255, .18); border-color: rgba(255, 255, 255, .35); color: #fff; }
 button:disabled { opacity: .5; cursor: default; }
-button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 .vol { display: flex; align-items: center; gap: 12px; margin-top: 18px; position: relative; z-index: 1; }
-.vol input { flex: 1; accent-color: #fff; }
-.vol span { min-width: 3.5em; text-align: right; color: rgba(255, 255, 255, .85); }
+.vol input { flex: 1; min-width: 0; accent-color: #fff; }
+.vol span { min-width: 3.5em; text-align: right; color: rgba(255, 255, 255, .9); }
 ul.list { list-style: none; margin: 0; padding: 0; }
 ul.list li { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 0; border-top: 1px solid var(--card-edge); }
 ul.list li:first-child { border-top: 0; }
 ul.list .ico { width: 38px; height: 38px; border-radius: 12px; flex: none; display: grid; place-items: center;
   background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #fff; font-size: 1.1rem; }
 ul.list .name { flex: 1 1 150px; min-width: 0; }
-/* The buttons drop to their own line when the name would be squeezed (phone width) */
-ul.list .acts { display: flex; gap: 8px; margin-left: auto; }
 ul.list .name b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 ul.list .name small { color: var(--mute); }
+/* The buttons drop to their own line when the name would be squeezed (phone width) */
+ul.list .acts { display: flex; gap: 8px; margin-left: auto; }
 .empty { color: var(--mute); padding: 4px 0; }
 .hint { color: var(--mute); font-size: .92rem; margin: 0; }
 label.toggle { display: flex; gap: 10px; align-items: center; margin-top: 12px; cursor: pointer; }
-label.toggle input { width: 20px; height: 20px; accent-color: var(--blue); }
+label.toggle input { width: 20px; height: 20px; flex: none; accent-color: var(--blue); }
 dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
 dl.kv dt { color: var(--mute); } dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 select { font: inherit; background: var(--chip); color: var(--ink); border: 1px solid var(--card-edge); border-radius: 10px; padding: 8px; }
-details summary { cursor: pointer; color: var(--sky); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: .85rem; }
-h3 { font-size: 1rem; margin: 18px 0 6px; }
-table.probe { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: .9rem; }
-table.probe th, table.probe td { text-align: left; padding: 6px 8px; border-top: 1px solid var(--card-edge); }
-table.probe th { color: var(--mute); font-weight: 600; }
-.bar { height: 8px; border-radius: 4px; background: var(--chip); overflow: hidden; min-width: 60px; }
-.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--sky), var(--blue)); }
+textarea { font: inherit; width: 100%; min-height: 90px; resize: vertical; border: 1px solid var(--card-edge); border-radius: 12px;
+  padding: 10px 12px; color: var(--ink); background: var(--chip); }
+.report { margin-top: 14px; border-top: 1px solid var(--card-edge); padding-top: 14px; }
+.report label { display: block; font-weight: 600; margin: 12px 0 6px; }
+.report-msg { margin: 10px 0 0; font-weight: 600; }
+.report-msg.ok { color: var(--ok); } .report-msg.bad { color: var(--red); }
+.code { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; padding: 12px 14px; border-radius: 14px;
+  background: var(--chip); border: 1px dashed var(--blue); }
+.code b { font-size: 1.8rem; letter-spacing: .18em; color: var(--sky); font-family: ui-monospace, Consolas, monospace; }
+details summary { cursor: pointer; color: var(--sky); font-weight: 700; margin-top: 16px; }
 pre { background: var(--bg); border: 1px solid var(--card-edge); border-radius: 12px; padding: 10px; max-height: 320px;
   overflow: auto; font-size: .78rem; white-space: pre-wrap; word-break: break-word; }
-.toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: var(--bg);
-  padding: 10px 16px; border-radius: 12px; opacity: 0; transition: opacity .2s; pointer-events: none; font-weight: 600; }
+.toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: #fff;
+  padding: 10px 16px; border-radius: 12px; opacity: 0; transition: opacity .2s; pointer-events: none; font-weight: 600; max-width: 90vw; }
 .toast.on { opacity: 1; }
+footer { text-align: center; color: var(--mute); font-size: .85rem; margin: 8px 0 24px; }
+footer a { color: var(--sky); }
 html.tv body { font-size: 22px; }
 html.tv main { max-width: 1120px; }
 html.tv button { padding: 14px 26px; }
-@media (max-width: 480px) { ul.list .acts { width: 100%; } ul.list .acts button { flex: 1; } .big { font-size: 1.25rem; } section { padding: 15px; border-radius: 16px; } }
+@media (max-width: 480px) {
+  ul.list .acts { width: 100%; } ul.list .acts button { flex: 1; }
+  .big { font-size: 1.25rem; } section { padding: 15px; border-radius: 16px; }
+  header h1 { font-size: 1.25rem; } header .ver { display: none; }
+}
 </style>
 </head>
 <body>
@@ -107,7 +117,7 @@ html.tv button { padding: 14px 26px; }
   </header>
 
   <section class="hero" aria-live="polite">
-    <h2 data-t="speaker"></h2>
+    <h2 data-t="device"></h2>
     <div class="status">
       <div class="dot" id="dot"></div>
       <div>
@@ -116,7 +126,7 @@ html.tv button { padding: 14px 26px; }
         <div class="err-text" id="error" hidden></div>
       </div>
     </div>
-    <div class="row" id="actions">
+    <div class="row">
       <button id="btn-disconnect" class="light" data-t="disconnect" hidden></button>
       <button id="btn-tone" class="light" data-t="tone" hidden></button>
     </div>
@@ -125,6 +135,7 @@ html.tv button { padding: 14px 26px; }
       <input type="range" id="vol" min="0" max="100" step="1">
       <span id="vol-v"></span>
     </div>
+    <p class="tip" id="tip" data-t="tip_controller" hidden></p>
   </section>
 
   <section>
@@ -151,22 +162,36 @@ html.tv button { padding: 14px 26px; }
   </section>
 
   <section>
-    <details id="diag">
-      <summary data-t="diagnostics"></summary>
-      <dl class="kv" id="numbers" style="margin-top:12px"></dl>
-      <div class="row"><button id="btn-copy" data-t="copy"></button><button id="btn-log" data-t="reload_log"></button></div>
-      <h3 data-t="probe_title"></h3>
-      <p class="hint" data-t="probe_hint"></p>
-      <div class="row"><button class="primary" id="btn-probe" data-t="probe_run"></button></div>
-      <div id="probe"></div>
+    <h2 data-t="help"></h2>
+    <p class="hint" data-t="help_hint"></p>
+    <div class="row">
+      <button class="primary" id="btn-report" data-t="report"></button>
+      <button id="btn-copy" data-t="copy"></button>
+    </div>
+    <div class="report" id="report-box" hidden>
+      <p class="hint" data-t="report_note"></p>
+      <label for="report-msg" data-t="report_msg"></label>
+      <textarea id="report-msg" maxlength="2000"></textarea>
       <div class="row">
-        <label for="source" data-t="source_used"></label>
-        <select id="source"></select>
+        <button class="primary" id="btn-report-send" data-t="report_send"></button>
+        <button id="btn-report-close" data-t="report_close"></button>
       </div>
-      <p class="hint" data-t="source_hint"></p>
+      <p class="report-msg" id="report-status"></p>
+      <div class="code" id="report-code" hidden>
+        <span data-t="report_sent"></span><b id="report-code-text"></b>
+        <button id="btn-report-copy" data-t="report_copy"></button>
+      </div>
+      <p class="hint" id="report-code-hint" data-t="report_code_hint" hidden></p>
+      <p class="hint" data-t="report_privacy" style="margin-top:10px"></p>
+    </div>
+    <details id="diag">
+      <summary data-t="details"></summary>
+      <dl class="kv" id="numbers" style="margin-top:12px"></dl>
+      <div class="row"><button id="btn-log" data-t="reload_log"></button></div>
       <pre id="log"></pre>
     </details>
   </section>
+  <footer>BlueBird · <a href="https://github.com/jpemendonca/BlueBird" target="_blank" rel="noopener">GitHub</a></footer>
 </main>
 <div class="toast" id="toast"></div>
 
@@ -175,214 +200,228 @@ html.tv button { padding: 14px 26px; }
 const LANG_NAMES = { en: "English", pt: "Português", es: "Español", fr: "Français", de: "Deutsch", ru: "Русский", ja: "日本語" };
 const I18N = {
   en: {
-    language: "Language",
-    speaker: "Speaker", disconnect: "Disconnect", tone: "Test tone", volume: "Volume",
-    search: "Find a speaker", scan: "Search", scanning: "Searching…",
-    search_hint: "Put the speaker in pairing mode (usually: hold its Bluetooth button until the light blinks fast), then search.",
-    show_others: "Show devices that are not speakers", saved: "Saved devices", auto: "Reconnect the last speaker by itself",
-    adapter: "Bluetooth adapter", prefer: "Use", any: "Any adapter", diagnostics: "Diagnostics",
-    copy: "Copy diagnostics", reload_log: "Reload log", connect: "Connect", forget: "Forget",
-    none_found: "Nothing found yet.", none_saved: "No saved device yet. Search for one above.",
+    language: "Language", device: "Audio device", disconnect: "Disconnect", tone: "Test tone", volume: "Volume",
+    tip_controller: "The controller's own speaker keeps playing the sounds games send to it. To silence it: Settings > Accessories > Controllers > Volume of controller speaker.",
+    search: "Find an audio device", scan: "Search", scanning: "Searching…",
+    search_hint: "Put the speaker or headphones in pairing mode (usually: hold the Bluetooth button until the light blinks fast), then search.",
+    show_others: "Also show devices that are not for audio", saved: "Saved devices", auto: "Reconnect the last device by itself",
+    adapter: "Bluetooth adapter", prefer: "Use", any: "Any adapter",
+    help: "Help", help_hint: "Something not working? Send a report, or copy the diagnostics into an issue on GitHub.",
+    report: "Send report", copy: "Copy diagnostics", details: "Technical details", reload_log: "Reload log",
+    report_note: "Sends this PS5's BlueBird log and diagnostics to the developer. Nothing leaves the console until you press Send.",
+    report_msg: "Tell us what is happening (optional)", report_send: "Send", report_close: "Close", report_sending: "Sending…",
+    report_sent: "Sent! Your report code:", report_code_hint: "Put this code in your message on GitHub or Reddit. It is how the developer finds your report.",
+    report_copy: "Copy code", report_copied: "Copied", report_later: "Too many sends right now. Try again later.",
+    report_tomorrow: "Today's report limit was reached. Try again tomorrow.",
+    report_fail: "Could not send. If the PS5 has no internet, open this page on your phone, on the same network, and send it from there. Or use Copy diagnostics and open an issue on GitHub.",
+    report_privacy: "MAC addresses are cut before saving, and the report is deleted after 90 days.",
+    connect: "Connect", forget: "Forget", none_found: "Nothing found yet.", none_saved: "No saved device yet. Search for one above.",
     no_adapter: "Plug a USB Bluetooth adapter into the PS5", no_adapter_sub: "BlueBird never uses the console's own Bluetooth: the DualSense keeps it.",
     starting: "Starting the adapter…", lost: "The adapter stopped answering", lost_sub: "Unplug it and plug it in again.",
-    idle: "No speaker connected", idle_sub_saved: "Switch the speaker on: BlueBird calls it every few seconds, or press Connect below.",
-    idle_sub_new: "Search for a speaker in pairing mode below.",
+    idle: "No audio device connected", idle_sub_saved: "Switch the device on: BlueBird calls it every few seconds, or press Connect below.",
+    idle_sub_new: "Search for a speaker or headphones in pairing mode below.",
     calling: "Calling {n}…", pairing: "Pairing with {n}…", opening: "Opening audio on {n}…",
-    ready: "{n} connected", ready_sub: "Starting the sound…",
-    playing: "Playing on {n}", playing_sub: "{rate} kHz SBC, quality {bp}",
+    ready: "{n} connected", ready_sub: "Starting the sound…", playing: "Playing on {n}", playing_sub: "{rate} kHz SBC, quality {bp}",
     copied: "Diagnostics copied", copy_fail: "Could not copy: select the text below",
     chip: "Chip", id: "USB id", address: "Address", firmware: "Firmware", buffers: "Buffers",
-    fw_loaded: "patch loaded", fw_rom: "ROM only (no patch for this chip)", fw_none: "none needed",
-    clone_note: " (CSR clone)", sent: "Packets sent", dropped: "Dropped", underruns: "Underruns",
-    buffered: "Buffered", capture: "Audio capture", bitpool: "Quality (bitpool)", link: "Link",
+    fw_loaded: "patch loaded", fw_rom: "ROM only (no patch for this chip)", fw_none: "none needed", clone_note: " (CSR clone)",
+    sent: "Packets sent", dropped: "Dropped", underruns: "Underruns", buffered: "Buffered", capture: "Audio capture",
+    bitpool: "Quality (bitpool)", link: "Link",
     err_answer: "{n} did not answer. Check it is on, close by, and not connected to a phone.",
-    err_pair: "Pairing failed. Put the speaker in pairing mode and press Connect again.",
-    err_range: "The speaker went out of range.", unnamed: "(no name)", busy: "Not possible right now",
-    probe_title: "Controller speaker audio (experiment)",
-    probe_hint: "The sound a game sends to the controller's speaker is a stream of its own. This test looks for it: open a game that plays sound on the controller, keep it playing, and press the button. It takes about 15 s and the speaker goes quiet meanwhile. Then copy the diagnostics and send them.",
-    probe_run: "Look for the controller audio", probe_running: "Looking… (15 s)",
-    probe_source: "Source", probe_open: "Opened", probe_rate: "Data", probe_level: "Level", yes: "yes", no: "no",
-    source_used: "Source used for the sound", source_hint: "Try 7: with a game playing sound on the controller, listen whether that sound now comes out of the headphones. 2 is the usual one.", source_usual: "usual",
+    err_pair: "Pairing failed. Put the device in pairing mode and press Connect again.",
+    err_range: "The device went out of range.", unnamed: "(no name)", busy: "Not possible right now",
   },
   pt: {
-    language: "Idioma",
-    speaker: "Caixa de som", disconnect: "Desconectar", tone: "Tom de teste", volume: "Volume",
-    search: "Achar uma caixa", scan: "Procurar", scanning: "Procurando…",
-    search_hint: "Coloque a caixa em modo de pareamento (normalmente: segure o botão Bluetooth até a luz piscar rápido) e procure.",
-    show_others: "Mostrar aparelhos que não são caixas", saved: "Dispositivos salvos", auto: "Reconectar sozinho a última caixa",
-    adapter: "Adaptador Bluetooth", prefer: "Usar", any: "Qualquer adaptador", diagnostics: "Diagnóstico",
-    copy: "Copiar diagnóstico", reload_log: "Recarregar log", connect: "Conectar", forget: "Esquecer",
-    none_found: "Nada encontrado ainda.", none_saved: "Nenhum dispositivo salvo ainda. Procure um acima.",
+    language: "Idioma", device: "Dispositivo de áudio", disconnect: "Desconectar", tone: "Tom de teste", volume: "Volume",
+    tip_controller: "O alto-falante do controle continua tocando os sons que o jogo manda para ele. Para silenciar: Configurações > Acessórios > Controles > Volume do alto-falante do controle.",
+    search: "Achar um dispositivo de áudio", scan: "Procurar", scanning: "Procurando…",
+    search_hint: "Coloque a caixa de som ou o fone em modo de pareamento (normalmente: segure o botão Bluetooth até a luz piscar rápido) e procure.",
+    show_others: "Mostrar também aparelhos que não são de áudio", saved: "Dispositivos salvos", auto: "Reconectar sozinho o último dispositivo",
+    adapter: "Adaptador Bluetooth", prefer: "Usar", any: "Qualquer adaptador",
+    help: "Ajuda", help_hint: "Algo não funcionou? Envie um relatório, ou copie o diagnóstico numa issue no GitHub.",
+    report: "Enviar relatório", copy: "Copiar diagnóstico", details: "Detalhes técnicos", reload_log: "Recarregar log",
+    report_note: "Envia o log e o diagnóstico do BlueBird deste PS5 para o desenvolvedor. Nada sai do console até você apertar Enviar.",
+    report_msg: "Conte o que está acontecendo (opcional)", report_send: "Enviar", report_close: "Fechar", report_sending: "Enviando…",
+    report_sent: "Enviado! Código do seu relatório:", report_code_hint: "Coloque esse código na sua mensagem no GitHub ou no Reddit. É com ele que o desenvolvedor acha o seu relatório.",
+    report_copy: "Copiar código", report_copied: "Copiado", report_later: "Muitos envios agora. Tente de novo mais tarde.",
+    report_tomorrow: "O limite de relatórios de hoje acabou. Tente de novo amanhã.",
+    report_fail: "Não deu para enviar. Se o PS5 estiver sem internet, abra este painel no celular, na mesma rede, e envie de lá. Ou use Copiar diagnóstico e abra uma issue no GitHub.",
+    report_privacy: "Endereços MAC são cortados antes de salvar, e o relatório é apagado em 90 dias.",
+    connect: "Conectar", forget: "Esquecer", none_found: "Nada encontrado ainda.", none_saved: "Nenhum dispositivo salvo ainda. Procure um acima.",
     no_adapter: "Plugue um adaptador Bluetooth USB no PS5", no_adapter_sub: "O BlueBird nunca usa o Bluetooth do console: ele fica com o DualSense.",
     starting: "Ligando o adaptador…", lost: "O adaptador parou de responder", lost_sub: "Tire e plugue de novo.",
-    idle: "Nenhuma caixa conectada", idle_sub_saved: "Ligue a caixa: o BlueBird chama ela a cada poucos segundos, ou toque em Conectar abaixo.",
-    idle_sub_new: "Procure uma caixa em modo de pareamento abaixo.",
+    idle: "Nenhum dispositivo de áudio conectado", idle_sub_saved: "Ligue o dispositivo: o BlueBird chama ele a cada poucos segundos, ou toque em Conectar abaixo.",
+    idle_sub_new: "Procure abaixo uma caixa de som ou um fone em modo de pareamento.",
     calling: "Chamando {n}…", pairing: "Pareando com {n}…", opening: "Abrindo o áudio em {n}…",
-    ready: "{n} conectada", ready_sub: "Começando o som…",
-    playing: "Tocando em {n}", playing_sub: "SBC {rate} kHz, qualidade {bp}",
+    ready: "{n} conectado", ready_sub: "Começando o som…", playing: "Tocando em {n}", playing_sub: "SBC {rate} kHz, qualidade {bp}",
     copied: "Diagnóstico copiado", copy_fail: "Não deu para copiar: selecione o texto abaixo",
     chip: "Chip", id: "ID USB", address: "Endereço", firmware: "Firmware", buffers: "Buffers",
-    fw_loaded: "patch carregado", fw_rom: "só ROM (sem patch para esse chip)", fw_none: "não precisa",
-    clone_note: " (clone CSR)", sent: "Pacotes enviados", dropped: "Perdidos", underruns: "Faltas de áudio",
-    buffered: "No buffer", capture: "Captura de áudio", bitpool: "Qualidade (bitpool)", link: "Link",
-    err_answer: "{n} não respondeu. Veja se está ligada, perto e sem estar conectada a um celular.",
-    err_pair: "O pareamento falhou. Coloque a caixa em modo de pareamento e toque em Conectar de novo.",
-    err_range: "A caixa saiu do alcance.", unnamed: "(sem nome)", busy: "Não dá agora",
-    probe_title: "Áudio do controle (experimento)",
-    probe_hint: "O som que o jogo manda para o alto-falante do controle é um fluxo separado. Este teste procura onde ele está: abra um jogo que toca som no controle, deixe tocando e aperte o botão. Leva uns 15 s e a caixa fica muda nesse tempo. Depois copie o diagnóstico e me mande.",
-    probe_run: "Procurar o áudio do controle", probe_running: "Procurando… (15 s)",
-    probe_source: "Fonte", probe_open: "Abriu", probe_rate: "Dados", probe_level: "Nível", yes: "sim", no: "não",
-    source_used: "Fonte usada no som", source_hint: "Experimente a 7: com um jogo tocando som no controle, ouça se esse som passa a sair no fone. A 2 é a de sempre.", source_usual: "de sempre",
+    fw_loaded: "patch carregado", fw_rom: "só ROM (sem patch para esse chip)", fw_none: "não precisa", clone_note: " (clone CSR)",
+    sent: "Pacotes enviados", dropped: "Perdidos", underruns: "Faltas de áudio", buffered: "No buffer", capture: "Captura de áudio",
+    bitpool: "Qualidade (bitpool)", link: "Link",
+    err_answer: "{n} não respondeu. Veja se está ligado, perto e sem estar conectado a um celular.",
+    err_pair: "O pareamento falhou. Coloque o dispositivo em modo de pareamento e toque em Conectar de novo.",
+    err_range: "O dispositivo saiu do alcance.", unnamed: "(sem nome)", busy: "Não dá agora",
   },
   es: {
-    language: "Idioma",
-    speaker: "Altavoz", disconnect: "Desconectar", tone: "Tono de prueba", volume: "Volumen",
-    search: "Buscar un altavoz", scan: "Buscar", scanning: "Buscando…",
-    search_hint: "Pon el altavoz en modo de emparejamiento (normalmente: mantén su botón Bluetooth hasta que la luz parpadee rápido) y busca.",
-    show_others: "Mostrar dispositivos que no son altavoces", saved: "Dispositivos guardados", auto: "Reconectar solo el último altavoz",
-    adapter: "Adaptador Bluetooth", prefer: "Usar", any: "Cualquier adaptador", diagnostics: "Diagnóstico",
-    copy: "Copiar diagnóstico", reload_log: "Recargar registro", connect: "Conectar", forget: "Olvidar",
-    none_found: "Todavía no se encontró nada.", none_saved: "Aún no hay dispositivos guardados. Busca uno arriba.",
+    language: "Idioma", device: "Dispositivo de audio", disconnect: "Desconectar", tone: "Tono de prueba", volume: "Volumen",
+    tip_controller: "El altavoz del mando sigue reproduciendo los sonidos que el juego le envía. Para silenciarlo: Ajustes > Accesorios > Mandos > Volumen del altavoz del mando.",
+    search: "Buscar un dispositivo de audio", scan: "Buscar", scanning: "Buscando…",
+    search_hint: "Pon el altavoz o los auriculares en modo de emparejamiento (normalmente: mantén el botón Bluetooth hasta que la luz parpadee rápido) y busca.",
+    show_others: "Mostrar también dispositivos que no son de audio", saved: "Dispositivos guardados", auto: "Reconectar solo el último dispositivo",
+    adapter: "Adaptador Bluetooth", prefer: "Usar", any: "Cualquier adaptador",
+    help: "Ayuda", help_hint: "¿Algo no funciona? Envía un informe, o copia el diagnóstico en un issue de GitHub.",
+    report: "Enviar informe", copy: "Copiar diagnóstico", details: "Detalles técnicos", reload_log: "Recargar registro",
+    report_note: "Envía el registro y el diagnóstico de BlueBird de esta PS5 al desarrollador. Nada sale de la consola hasta que pulses Enviar.",
+    report_msg: "Cuenta qué está pasando (opcional)", report_send: "Enviar", report_close: "Cerrar", report_sending: "Enviando…",
+    report_sent: "¡Enviado! Código de tu informe:", report_code_hint: "Pon este código en tu mensaje en GitHub o Reddit. Con él, el desarrollador encuentra tu informe.",
+    report_copy: "Copiar código", report_copied: "Copiado", report_later: "Demasiados envíos ahora. Inténtalo más tarde.",
+    report_tomorrow: "Se alcanzó el límite de informes de hoy. Inténtalo mañana.",
+    report_fail: "No se pudo enviar. Si la PS5 no tiene internet, abre este panel en el móvil, en la misma red, y envíalo desde allí. O usa Copiar diagnóstico y abre un issue en GitHub.",
+    report_privacy: "Las direcciones MAC se recortan antes de guardar, y el informe se borra a los 90 días.",
+    connect: "Conectar", forget: "Olvidar", none_found: "Todavía no se encontró nada.", none_saved: "Aún no hay dispositivos guardados. Busca uno arriba.",
     no_adapter: "Conecta un adaptador Bluetooth USB a la PS5", no_adapter_sub: "BlueBird nunca usa el Bluetooth de la consola: lo conserva el DualSense.",
     starting: "Iniciando el adaptador…", lost: "El adaptador dejó de responder", lost_sub: "Desconéctalo y vuelve a conectarlo.",
-    idle: "Ningún altavoz conectado", idle_sub_saved: "Enciende el altavoz: BlueBird lo llama cada pocos segundos, o pulsa Conectar abajo.",
-    idle_sub_new: "Busca abajo un altavoz en modo de emparejamiento.",
+    idle: "Ningún dispositivo de audio conectado", idle_sub_saved: "Enciende el dispositivo: BlueBird lo llama cada pocos segundos, o pulsa Conectar abajo.",
+    idle_sub_new: "Busca abajo un altavoz o unos auriculares en modo de emparejamiento.",
     calling: "Llamando a {n}…", pairing: "Emparejando con {n}…", opening: "Abriendo el audio en {n}…",
-    ready: "{n} conectado", ready_sub: "Iniciando el sonido…",
-    playing: "Sonando en {n}", playing_sub: "SBC {rate} kHz, calidad {bp}",
+    ready: "{n} conectado", ready_sub: "Iniciando el sonido…", playing: "Sonando en {n}", playing_sub: "SBC {rate} kHz, calidad {bp}",
     copied: "Diagnóstico copiado", copy_fail: "No se pudo copiar: selecciona el texto de abajo",
     chip: "Chip", id: "ID USB", address: "Dirección", firmware: "Firmware", buffers: "Búferes",
-    fw_loaded: "parche cargado", fw_rom: "solo ROM (no hay parche para este chip)", fw_none: "no hace falta",
-    clone_note: " (clon CSR)", sent: "Paquetes enviados", dropped: "Perdidos", underruns: "Faltas de audio",
-    buffered: "En el búfer", capture: "Captura de audio", bitpool: "Calidad (bitpool)", link: "Enlace",
+    fw_loaded: "parche cargado", fw_rom: "solo ROM (no hay parche para este chip)", fw_none: "no hace falta", clone_note: " (clon CSR)",
+    sent: "Paquetes enviados", dropped: "Perdidos", underruns: "Faltas de audio", buffered: "En el búfer", capture: "Captura de audio",
+    bitpool: "Calidad (bitpool)", link: "Enlace",
     err_answer: "{n} no respondió. Comprueba que está encendido, cerca y no conectado a un teléfono.",
-    err_pair: "El emparejamiento falló. Pon el altavoz en modo de emparejamiento y pulsa Conectar de nuevo.",
-    err_range: "El altavoz quedó fuera de alcance.", unnamed: "(sin nombre)", busy: "No es posible ahora",
-    probe_title: "Audio del mando (experimento)",
-    probe_hint: "El sonido que un juego envía al altavoz del mando es un flujo aparte. Esta prueba lo busca: abre un juego que suene en el mando, déjalo sonando y pulsa el botón. Tarda unos 15 s y el altavoz queda en silencio mientras tanto. Luego copia el diagnóstico y envíalo.",
-    probe_run: "Buscar el audio del mando", probe_running: "Buscando… (15 s)",
-    probe_source: "Fuente", probe_open: "Abrió", probe_rate: "Datos", probe_level: "Nivel", yes: "sí", no: "no",
-    source_used: "Fuente usada para el sonido", source_hint: "Prueba la 7: con un juego que suene en el mando, escucha si ese sonido sale ahora por los auriculares. La 2 es la habitual.", source_usual: "habitual",
+    err_pair: "El emparejamiento falló. Pon el dispositivo en modo de emparejamiento y pulsa Conectar de nuevo.",
+    err_range: "El dispositivo quedó fuera de alcance.", unnamed: "(sin nombre)", busy: "No es posible ahora",
   },
   fr: {
-    language: "Langue",
-    speaker: "Enceinte", disconnect: "Déconnecter", tone: "Son de test", volume: "Volume",
-    search: "Trouver une enceinte", scan: "Rechercher", scanning: "Recherche…",
-    search_hint: "Mettez l'enceinte en mode d'appairage (en général : maintenez son bouton Bluetooth jusqu'à ce que le voyant clignote vite), puis lancez la recherche.",
-    show_others: "Afficher les appareils qui ne sont pas des enceintes", saved: "Appareils enregistrés", auto: "Reconnecter seul la dernière enceinte",
-    adapter: "Adaptateur Bluetooth", prefer: "Utiliser", any: "N'importe quel adaptateur", diagnostics: "Diagnostic",
-    copy: "Copier le diagnostic", reload_log: "Recharger le journal", connect: "Connecter", forget: "Oublier",
-    none_found: "Rien trouvé pour l'instant.", none_saved: "Aucun appareil enregistré. Recherchez-en un ci-dessus.",
+    language: "Langue", device: "Appareil audio", disconnect: "Déconnecter", tone: "Son de test", volume: "Volume",
+    tip_controller: "Le haut-parleur de la manette continue de jouer les sons que le jeu lui envoie. Pour le couper : Paramètres > Accessoires > Manettes > Volume du haut-parleur de la manette.",
+    search: "Trouver un appareil audio", scan: "Rechercher", scanning: "Recherche…",
+    search_hint: "Mettez l'enceinte ou le casque en mode d'appairage (en général : maintenez le bouton Bluetooth jusqu'à ce que le voyant clignote vite), puis lancez la recherche.",
+    show_others: "Afficher aussi les appareils qui ne sont pas audio", saved: "Appareils enregistrés", auto: "Reconnecter seul le dernier appareil",
+    adapter: "Adaptateur Bluetooth", prefer: "Utiliser", any: "N'importe quel adaptateur",
+    help: "Aide", help_hint: "Quelque chose ne marche pas ? Envoyez un rapport, ou copiez le diagnostic dans une issue GitHub.",
+    report: "Envoyer un rapport", copy: "Copier le diagnostic", details: "Détails techniques", reload_log: "Recharger le journal",
+    report_note: "Envoie le journal et le diagnostic BlueBird de cette PS5 au développeur. Rien ne quitte la console tant que vous n'appuyez pas sur Envoyer.",
+    report_msg: "Décrivez ce qui se passe (facultatif)", report_send: "Envoyer", report_close: "Fermer", report_sending: "Envoi…",
+    report_sent: "Envoyé ! Code de votre rapport :", report_code_hint: "Mettez ce code dans votre message sur GitHub ou Reddit. C'est avec lui que le développeur retrouve votre rapport.",
+    report_copy: "Copier le code", report_copied: "Copié", report_later: "Trop d'envois pour le moment. Réessayez plus tard.",
+    report_tomorrow: "La limite de rapports du jour est atteinte. Réessayez demain.",
+    report_fail: "Envoi impossible. Si la PS5 n'a pas internet, ouvrez cette page sur votre téléphone, sur le même réseau, et envoyez depuis celui-ci. Ou utilisez Copier le diagnostic et ouvrez une issue sur GitHub.",
+    report_privacy: "Les adresses MAC sont tronquées avant l'enregistrement, et le rapport est supprimé après 90 jours.",
+    connect: "Connecter", forget: "Oublier", none_found: "Rien trouvé pour l'instant.", none_saved: "Aucun appareil enregistré. Recherchez-en un ci-dessus.",
     no_adapter: "Branchez un adaptateur Bluetooth USB sur la PS5", no_adapter_sub: "BlueBird n'utilise jamais le Bluetooth de la console : la DualSense le garde.",
     starting: "Démarrage de l'adaptateur…", lost: "L'adaptateur ne répond plus", lost_sub: "Débranchez-le puis rebranchez-le.",
-    idle: "Aucune enceinte connectée", idle_sub_saved: "Allumez l'enceinte : BlueBird l'appelle toutes les quelques secondes, ou appuyez sur Connecter ci-dessous.",
-    idle_sub_new: "Recherchez ci-dessous une enceinte en mode d'appairage.",
+    idle: "Aucun appareil audio connecté", idle_sub_saved: "Allumez l'appareil : BlueBird l'appelle toutes les quelques secondes, ou appuyez sur Connecter ci-dessous.",
+    idle_sub_new: "Recherchez ci-dessous une enceinte ou un casque en mode d'appairage.",
     calling: "Appel de {n}…", pairing: "Appairage avec {n}…", opening: "Ouverture de l'audio sur {n}…",
-    ready: "{n} connectée", ready_sub: "Démarrage du son…",
-    playing: "Lecture sur {n}", playing_sub: "SBC {rate} kHz, qualité {bp}",
+    ready: "{n} connecté", ready_sub: "Démarrage du son…", playing: "Lecture sur {n}", playing_sub: "SBC {rate} kHz, qualité {bp}",
     copied: "Diagnostic copié", copy_fail: "Copie impossible : sélectionnez le texte ci-dessous",
     chip: "Puce", id: "ID USB", address: "Adresse", firmware: "Firmware", buffers: "Tampons",
-    fw_loaded: "correctif chargé", fw_rom: "ROM seule (pas de correctif pour cette puce)", fw_none: "inutile",
-    clone_note: " (clone CSR)", sent: "Paquets envoyés", dropped: "Perdus", underruns: "Manques d'audio",
-    buffered: "En tampon", capture: "Capture audio", bitpool: "Qualité (bitpool)", link: "Liaison",
-    err_answer: "{n} n'a pas répondu. Vérifiez qu'elle est allumée, proche et pas connectée à un téléphone.",
-    err_pair: "L'appairage a échoué. Mettez l'enceinte en mode d'appairage et appuyez de nouveau sur Connecter.",
-    err_range: "L'enceinte est hors de portée.", unnamed: "(sans nom)", busy: "Impossible pour le moment",
-    probe_title: "Son de la manette (expérience)",
-    probe_hint: "Le son qu'un jeu envoie au haut-parleur de la manette est un flux à part. Ce test le cherche : lancez un jeu qui joue du son sur la manette, laissez-le jouer et appuyez sur le bouton. Cela prend environ 15 s et l'enceinte se tait pendant ce temps. Copiez ensuite le diagnostic et envoyez-le.",
-    probe_run: "Chercher le son de la manette", probe_running: "Recherche… (15 s)",
-    probe_source: "Source", probe_open: "Ouverte", probe_rate: "Données", probe_level: "Niveau", yes: "oui", no: "non",
-    source_used: "Source utilisée pour le son", source_hint: "Essayez la 7 : avec un jeu qui joue du son sur la manette, écoutez si ce son sort maintenant dans le casque. La 2 est l'habituelle.", source_usual: "habituelle",
+    fw_loaded: "correctif chargé", fw_rom: "ROM seule (pas de correctif pour cette puce)", fw_none: "inutile", clone_note: " (clone CSR)",
+    sent: "Paquets envoyés", dropped: "Perdus", underruns: "Manques d'audio", buffered: "En tampon", capture: "Capture audio",
+    bitpool: "Qualité (bitpool)", link: "Liaison",
+    err_answer: "{n} n'a pas répondu. Vérifiez qu'il est allumé, proche et pas connecté à un téléphone.",
+    err_pair: "L'appairage a échoué. Mettez l'appareil en mode d'appairage et appuyez de nouveau sur Connecter.",
+    err_range: "L'appareil est hors de portée.", unnamed: "(sans nom)", busy: "Impossible pour le moment",
   },
   de: {
-    language: "Sprache",
-    speaker: "Lautsprecher", disconnect: "Trennen", tone: "Testton", volume: "Lautstärke",
-    search: "Lautsprecher finden", scan: "Suchen", scanning: "Suche läuft…",
-    search_hint: "Versetze den Lautsprecher in den Kopplungsmodus (meist: Bluetooth-Taste halten, bis das Licht schnell blinkt) und suche dann.",
-    show_others: "Geräte zeigen, die keine Lautsprecher sind", saved: "Gespeicherte Geräte", auto: "Letzten Lautsprecher automatisch verbinden",
-    adapter: "Bluetooth-Adapter", prefer: "Verwenden", any: "Beliebiger Adapter", diagnostics: "Diagnose",
-    copy: "Diagnose kopieren", reload_log: "Protokoll neu laden", connect: "Verbinden", forget: "Entfernen",
-    none_found: "Noch nichts gefunden.", none_saved: "Noch kein Gerät gespeichert. Suche oben nach einem.",
+    language: "Sprache", device: "Audiogerät", disconnect: "Trennen", tone: "Testton", volume: "Lautstärke",
+    tip_controller: "Der Lautsprecher des Controllers spielt weiter die Töne, die Spiele an ihn schicken. Zum Stummschalten: Einstellungen > Zubehör > Controller > Lautstärke des Controller-Lautsprechers.",
+    search: "Audiogerät finden", scan: "Suchen", scanning: "Suche läuft…",
+    search_hint: "Versetze den Lautsprecher oder Kopfhörer in den Kopplungsmodus (meist: Bluetooth-Taste halten, bis das Licht schnell blinkt) und suche dann.",
+    show_others: "Auch Geräte zeigen, die nicht für Audio sind", saved: "Gespeicherte Geräte", auto: "Letztes Gerät automatisch verbinden",
+    adapter: "Bluetooth-Adapter", prefer: "Verwenden", any: "Beliebiger Adapter",
+    help: "Hilfe", help_hint: "Funktioniert etwas nicht? Sende einen Bericht oder kopiere die Diagnose in ein Issue auf GitHub.",
+    report: "Bericht senden", copy: "Diagnose kopieren", details: "Technische Details", reload_log: "Protokoll neu laden",
+    report_note: "Sendet das BlueBird-Protokoll und die Diagnose dieser PS5 an den Entwickler. Nichts verlässt die Konsole, bevor du auf Senden drückst.",
+    report_msg: "Beschreibe, was passiert (optional)", report_send: "Senden", report_close: "Schließen", report_sending: "Wird gesendet…",
+    report_sent: "Gesendet! Dein Berichtscode:", report_code_hint: "Schreib diesen Code in deine Nachricht auf GitHub oder Reddit. Damit findet der Entwickler deinen Bericht.",
+    report_copy: "Code kopieren", report_copied: "Kopiert", report_later: "Gerade zu viele Sendungen. Versuche es später erneut.",
+    report_tomorrow: "Das heutige Berichtslimit ist erreicht. Versuche es morgen erneut.",
+    report_fail: "Senden nicht möglich. Hat die PS5 kein Internet, öffne diese Seite auf dem Handy im selben Netz und sende von dort. Oder nutze Diagnose kopieren und eröffne ein Issue auf GitHub.",
+    report_privacy: "MAC-Adressen werden vor dem Speichern gekürzt, und der Bericht wird nach 90 Tagen gelöscht.",
+    connect: "Verbinden", forget: "Entfernen", none_found: "Noch nichts gefunden.", none_saved: "Noch kein Gerät gespeichert. Suche oben nach einem.",
     no_adapter: "Stecke einen USB-Bluetooth-Adapter in die PS5", no_adapter_sub: "BlueBird nutzt nie das Bluetooth der Konsole: Es bleibt beim DualSense.",
     starting: "Adapter wird gestartet…", lost: "Der Adapter antwortet nicht mehr", lost_sub: "Abziehen und wieder einstecken.",
-    idle: "Kein Lautsprecher verbunden", idle_sub_saved: "Schalte den Lautsprecher ein: BlueBird ruft ihn alle paar Sekunden, oder tippe unten auf Verbinden.",
-    idle_sub_new: "Suche unten nach einem Lautsprecher im Kopplungsmodus.",
+    idle: "Kein Audiogerät verbunden", idle_sub_saved: "Schalte das Gerät ein: BlueBird ruft es alle paar Sekunden, oder tippe unten auf Verbinden.",
+    idle_sub_new: "Suche unten nach einem Lautsprecher oder Kopfhörer im Kopplungsmodus.",
     calling: "Rufe {n}…", pairing: "Kopple mit {n}…", opening: "Öffne den Ton auf {n}…",
-    ready: "{n} verbunden", ready_sub: "Ton startet…",
-    playing: "Wiedergabe auf {n}", playing_sub: "SBC {rate} kHz, Qualität {bp}",
+    ready: "{n} verbunden", ready_sub: "Ton startet…", playing: "Wiedergabe auf {n}", playing_sub: "SBC {rate} kHz, Qualität {bp}",
     copied: "Diagnose kopiert", copy_fail: "Kopieren nicht möglich: Markiere den Text unten",
     chip: "Chip", id: "USB-ID", address: "Adresse", firmware: "Firmware", buffers: "Puffer",
-    fw_loaded: "Patch geladen", fw_rom: "nur ROM (kein Patch für diesen Chip)", fw_none: "nicht nötig",
-    clone_note: " (CSR-Klon)", sent: "Gesendete Pakete", dropped: "Verworfen", underruns: "Tonaussetzer",
-    buffered: "Im Puffer", capture: "Tonaufnahme", bitpool: "Qualität (Bitpool)", link: "Verbindung",
-    err_answer: "{n} hat nicht geantwortet. Prüfe, ob er an, in der Nähe und nicht mit einem Handy verbunden ist.",
-    err_pair: "Kopplung fehlgeschlagen. Versetze den Lautsprecher in den Kopplungsmodus und tippe erneut auf Verbinden.",
-    err_range: "Der Lautsprecher ist außer Reichweite.", unnamed: "(ohne Namen)", busy: "Gerade nicht möglich",
-    probe_title: "Ton des Controllers (Experiment)",
-    probe_hint: "Der Ton, den ein Spiel an den Controller-Lautsprecher schickt, ist ein eigener Strom. Dieser Test sucht ihn: Starte ein Spiel, das Ton am Controller abspielt, lass es laufen und drücke die Taste. Das dauert etwa 15 s, der Lautsprecher ist so lange still. Kopiere danach die Diagnose und schicke sie.",
-    probe_run: "Controller-Ton suchen", probe_running: "Suche… (15 s)",
-    probe_source: "Quelle", probe_open: "Geöffnet", probe_rate: "Daten", probe_level: "Pegel", yes: "ja", no: "nein",
-    source_used: "Quelle für den Ton", source_hint: "Probiere 7: Höre, ob der Ton, den ein Spiel am Controller abspielt, jetzt aus dem Kopfhörer kommt. 2 ist die übliche.", source_usual: "üblich",
+    fw_loaded: "Patch geladen", fw_rom: "nur ROM (kein Patch für diesen Chip)", fw_none: "nicht nötig", clone_note: " (CSR-Klon)",
+    sent: "Gesendete Pakete", dropped: "Verworfen", underruns: "Tonaussetzer", buffered: "Im Puffer", capture: "Tonaufnahme",
+    bitpool: "Qualität (Bitpool)", link: "Verbindung",
+    err_answer: "{n} hat nicht geantwortet. Prüfe, ob es an, in der Nähe und nicht mit einem Handy verbunden ist.",
+    err_pair: "Kopplung fehlgeschlagen. Versetze das Gerät in den Kopplungsmodus und tippe erneut auf Verbinden.",
+    err_range: "Das Gerät ist außer Reichweite.", unnamed: "(ohne Namen)", busy: "Gerade nicht möglich",
   },
   ru: {
-    language: "Язык",
-    speaker: "Колонка", disconnect: "Отключить", tone: "Тестовый сигнал", volume: "Громкость",
-    search: "Найти колонку", scan: "Поиск", scanning: "Идёт поиск…",
-    search_hint: "Переведите колонку в режим сопряжения (обычно: удерживайте кнопку Bluetooth, пока индикатор не начнёт быстро мигать) и начните поиск.",
-    show_others: "Показывать устройства, которые не являются колонками", saved: "Сохранённые устройства", auto: "Подключать последнюю колонку автоматически",
-    adapter: "Bluetooth-адаптер", prefer: "Использовать", any: "Любой адаптер", diagnostics: "Диагностика",
-    copy: "Копировать диагностику", reload_log: "Обновить журнал", connect: "Подключить", forget: "Забыть",
-    none_found: "Пока ничего не найдено.", none_saved: "Сохранённых устройств пока нет. Найдите устройство выше.",
+    language: "Язык", device: "Аудиоустройство", disconnect: "Отключить", tone: "Тестовый сигнал", volume: "Громкость",
+    tip_controller: "Динамик геймпада по-прежнему воспроизводит звуки, которые ему отправляет игра. Чтобы выключить его: Настройки > Аксессуары > Контроллеры > Громкость динамика контроллера.",
+    search: "Найти аудиоустройство", scan: "Поиск", scanning: "Идёт поиск…",
+    search_hint: "Переведите колонку или наушники в режим сопряжения (обычно: удерживайте кнопку Bluetooth, пока индикатор не начнёт быстро мигать) и начните поиск.",
+    show_others: "Показывать и устройства, не предназначенные для звука", saved: "Сохранённые устройства", auto: "Подключать последнее устройство автоматически",
+    adapter: "Bluetooth-адаптер", prefer: "Использовать", any: "Любой адаптер",
+    help: "Помощь", help_hint: "Что-то не работает? Отправьте отчёт или скопируйте диагностику в issue на GitHub.",
+    report: "Отправить отчёт", copy: "Копировать диагностику", details: "Технические подробности", reload_log: "Обновить журнал",
+    report_note: "Отправляет журнал и диагностику BlueBird с этой PS5 разработчику. Ничего не покидает консоль, пока вы не нажмёте «Отправить».",
+    report_msg: "Опишите, что происходит (необязательно)", report_send: "Отправить", report_close: "Закрыть", report_sending: "Отправка…",
+    report_sent: "Отправлено! Код вашего отчёта:", report_code_hint: "Укажите этот код в сообщении на GitHub или Reddit. По нему разработчик найдёт ваш отчёт.",
+    report_copy: "Копировать код", report_copied: "Скопировано", report_later: "Сейчас слишком много отправок. Попробуйте позже.",
+    report_tomorrow: "Дневной лимит отчётов исчерпан. Попробуйте завтра.",
+    report_fail: "Не удалось отправить. Если у PS5 нет интернета, откройте эту страницу на телефоне в той же сети и отправьте оттуда. Или скопируйте диагностику и создайте issue на GitHub.",
+    report_privacy: "MAC-адреса обрезаются перед сохранением, а отчёт удаляется через 90 дней.",
+    connect: "Подключить", forget: "Забыть", none_found: "Пока ничего не найдено.", none_saved: "Сохранённых устройств пока нет. Найдите устройство выше.",
     no_adapter: "Подключите USB-адаптер Bluetooth к PS5", no_adapter_sub: "BlueBird никогда не использует Bluetooth консоли: он остаётся у DualSense.",
     starting: "Запуск адаптера…", lost: "Адаптер перестал отвечать", lost_sub: "Отключите и подключите его снова.",
-    idle: "Колонка не подключена", idle_sub_saved: "Включите колонку: BlueBird вызывает её каждые несколько секунд, или нажмите «Подключить» ниже.",
-    idle_sub_new: "Найдите ниже колонку в режиме сопряжения.",
+    idle: "Аудиоустройство не подключено", idle_sub_saved: "Включите устройство: BlueBird вызывает его каждые несколько секунд, или нажмите «Подключить» ниже.",
+    idle_sub_new: "Найдите ниже колонку или наушники в режиме сопряжения.",
     calling: "Вызов {n}…", pairing: "Сопряжение с {n}…", opening: "Открытие звука на {n}…",
-    ready: "{n} подключена", ready_sub: "Запуск звука…",
-    playing: "Звук на {n}", playing_sub: "SBC {rate} кГц, качество {bp}",
+    ready: "{n}: подключено", ready_sub: "Запуск звука…", playing: "Звук на {n}", playing_sub: "SBC {rate} кГц, качество {bp}",
     copied: "Диагностика скопирована", copy_fail: "Не удалось скопировать: выделите текст ниже",
     chip: "Чип", id: "USB ID", address: "Адрес", firmware: "Прошивка", buffers: "Буферы",
-    fw_loaded: "патч загружен", fw_rom: "только ROM (нет патча для этого чипа)", fw_none: "не нужна",
-    clone_note: " (клон CSR)", sent: "Отправлено пакетов", dropped: "Потеряно", underruns: "Пропуски звука",
-    buffered: "В буфере", capture: "Захват звука", bitpool: "Качество (bitpool)", link: "Связь",
-    err_answer: "{n} не ответила. Проверьте, что она включена, рядом и не подключена к телефону.",
-    err_pair: "Сопряжение не удалось. Переведите колонку в режим сопряжения и снова нажмите «Подключить».",
-    err_range: "Колонка вне зоны действия.", unnamed: "(без имени)", busy: "Сейчас недоступно",
-    probe_title: "Звук геймпада (эксперимент)",
-    probe_hint: "Звук, который игра отправляет на динамик геймпада, идёт отдельным потоком. Этот тест ищет его: запустите игру со звуком на геймпаде, оставьте её играть и нажмите кнопку. Это займёт около 15 с, колонка в это время молчит. Затем скопируйте диагностику и отправьте её.",
-    probe_run: "Найти звук геймпада", probe_running: "Поиск… (15 с)",
-    probe_source: "Источник", probe_open: "Открыт", probe_rate: "Данные", probe_level: "Уровень", yes: "да", no: "нет",
-    source_used: "Источник звука", source_hint: "Попробуйте 7: при игре со звуком на геймпаде послушайте, звучит ли он теперь в наушниках. 2 — обычный.", source_usual: "обычный",
+    fw_loaded: "патч загружен", fw_rom: "только ROM (нет патча для этого чипа)", fw_none: "не нужна", clone_note: " (клон CSR)",
+    sent: "Отправлено пакетов", dropped: "Потеряно", underruns: "Пропуски звука", buffered: "В буфере", capture: "Захват звука",
+    bitpool: "Качество (bitpool)", link: "Связь",
+    err_answer: "{n} не отвечает. Проверьте, что устройство включено, рядом и не подключено к телефону.",
+    err_pair: "Сопряжение не удалось. Переведите устройство в режим сопряжения и снова нажмите «Подключить».",
+    err_range: "Устройство вне зоны действия.", unnamed: "(без имени)", busy: "Сейчас недоступно",
   },
   ja: {
-    language: "言語",
-    speaker: "スピーカー", disconnect: "切断", tone: "テスト音", volume: "音量",
-    search: "スピーカーを探す", scan: "検索", scanning: "検索中…",
-    search_hint: "スピーカーをペアリングモードにしてから検索してください(通常は Bluetooth ボタンをランプが速く点滅するまで長押し)。",
-    show_others: "スピーカー以外の機器も表示", saved: "保存済みのデバイス", auto: "前回のスピーカーに自動で再接続",
-    adapter: "Bluetooth アダプター", prefer: "使用", any: "どのアダプターでも", diagnostics: "診断",
-    copy: "診断をコピー", reload_log: "ログを再読み込み", connect: "接続", forget: "削除",
-    none_found: "まだ見つかりません。", none_saved: "保存済みのデバイスはありません。上で検索してください。",
+    language: "言語", device: "オーディオ機器", disconnect: "切断", tone: "テスト音", volume: "音量",
+    tip_controller: "コントローラーのスピーカーは、ゲームが送る音を引き続き再生します。消すには: 設定 > アクセサリー > コントローラー > コントローラーのスピーカーの音量。",
+    search: "オーディオ機器を探す", scan: "検索", scanning: "検索中…",
+    search_hint: "スピーカーやヘッドホンをペアリングモードにしてから検索してください(通常は Bluetooth ボタンをランプが速く点滅するまで長押し)。",
+    show_others: "オーディオ以外の機器も表示", saved: "保存済みのデバイス", auto: "前回の機器に自動で再接続",
+    adapter: "Bluetooth アダプター", prefer: "使用", any: "どのアダプターでも",
+    help: "ヘルプ", help_hint: "うまく動きませんか? レポートを送るか、診断をコピーして GitHub の issue に貼ってください。",
+    report: "レポートを送信", copy: "診断をコピー", details: "技術的な詳細", reload_log: "ログを再読み込み",
+    report_note: "この PS5 の BlueBird のログと診断を開発者に送ります。「送信」を押すまで本体から何も送られません。",
+    report_msg: "起きていることを書いてください (任意)", report_send: "送信", report_close: "閉じる", report_sending: "送信中…",
+    report_sent: "送信しました! レポートコード:", report_code_hint: "このコードを GitHub や Reddit のメッセージに書いてください。開発者はこのコードでレポートを探します。",
+    report_copy: "コードをコピー", report_copied: "コピーしました", report_later: "送信が多すぎます。後でもう一度お試しください。",
+    report_tomorrow: "今日のレポート上限に達しました。明日もう一度お試しください。",
+    report_fail: "送信できませんでした。PS5 がインターネットにつながっていない場合は、同じネットワークのスマホでこのページを開いて送信してください。または診断をコピーして GitHub に issue を作成してください。",
+    report_privacy: "MAC アドレスは保存前に短縮され、レポートは 90 日後に削除されます。",
+    connect: "接続", forget: "削除", none_found: "まだ見つかりません。", none_saved: "保存済みのデバイスはありません。上で検索してください。",
     no_adapter: "PS5 に USB Bluetooth アダプターを接続してください", no_adapter_sub: "BlueBird は本体の Bluetooth を使いません。DualSense がそのまま使います。",
     starting: "アダプターを起動中…", lost: "アダプターが応答しません", lost_sub: "抜いてから挿し直してください。",
-    idle: "スピーカー未接続", idle_sub_saved: "スピーカーの電源を入れてください。BlueBird が数秒ごとに呼び出します。下の「接続」でも接続できます。",
-    idle_sub_new: "下でペアリングモードのスピーカーを検索してください。",
+    idle: "オーディオ機器が未接続", idle_sub_saved: "機器の電源を入れてください。BlueBird が数秒ごとに呼び出します。下の「接続」でも接続できます。",
+    idle_sub_new: "下でペアリングモードのスピーカーやヘッドホンを検索してください。",
     calling: "{n} を呼び出し中…", pairing: "{n} とペアリング中…", opening: "{n} の音声を開いています…",
-    ready: "{n} に接続済み", ready_sub: "音声を開始しています…",
-    playing: "{n} で再生中", playing_sub: "SBC {rate} kHz、品質 {bp}",
+    ready: "{n} に接続済み", ready_sub: "音声を開始しています…", playing: "{n} で再生中", playing_sub: "SBC {rate} kHz、品質 {bp}",
     copied: "診断をコピーしました", copy_fail: "コピーできません。下のテキストを選択してください",
     chip: "チップ", id: "USB ID", address: "アドレス", firmware: "ファームウェア", buffers: "バッファー",
-    fw_loaded: "パッチ読み込み済み", fw_rom: "ROM のみ(このチップのパッチなし)", fw_none: "不要",
-    clone_note: " (CSR 互換品)", sent: "送信パケット", dropped: "破棄", underruns: "音切れ",
-    buffered: "バッファー内", capture: "音声キャプチャ", bitpool: "品質 (bitpool)", link: "リンク",
+    fw_loaded: "パッチ読み込み済み", fw_rom: "ROM のみ(このチップのパッチなし)", fw_none: "不要", clone_note: " (CSR 互換品)",
+    sent: "送信パケット", dropped: "破棄", underruns: "音切れ", buffered: "バッファー内", capture: "音声キャプチャ",
+    bitpool: "品質 (bitpool)", link: "リンク",
     err_answer: "{n} が応答しませんでした。電源が入っていて、近くにあり、スマホに接続されていないか確認してください。",
-    err_pair: "ペアリングに失敗しました。スピーカーをペアリングモードにして、もう一度「接続」を押してください。",
-    err_range: "スピーカーが範囲外になりました。", unnamed: "(名前なし)", busy: "今はできません",
-    probe_title: "コントローラーの音声 (実験)",
-    probe_hint: "ゲームがコントローラーのスピーカーに送る音は別のストリームです。このテストはそれを探します。コントローラーから音が出るゲームを再生したままボタンを押してください。約 15 秒かかり、その間スピーカーは無音になります。その後、診断をコピーして送ってください。",
-    probe_run: "コントローラーの音声を探す", probe_running: "検索中… (15 秒)",
-    probe_source: "ソース", probe_open: "開いた", probe_rate: "データ", probe_level: "レベル", yes: "はい", no: "いいえ",
-    source_used: "音声に使うソース", source_hint: "7 を試してください。コントローラーから音が出るゲームで、その音がヘッドホンから聞こえるか確認します。通常は 2 です。", source_usual: "通常",
+    err_pair: "ペアリングに失敗しました。機器をペアリングモードにして、もう一度「接続」を押してください。",
+    err_range: "機器が範囲外になりました。", unnamed: "(名前なし)", busy: "今はできません",
   },
 };
 const params = new URLSearchParams(location.search);
@@ -417,7 +456,7 @@ function toast(msg) {
   t.textContent = msg;
   t.classList.add("on");
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => t.classList.remove("on"), 2200);
+  toast.timer = setTimeout(() => t.classList.remove("on"), 2400);
 }
 
 async function post(path) {
@@ -429,7 +468,7 @@ async function post(path) {
   } catch (e) { toast(T("busy")); return false; }
 }
 
-let state = null, volumeTouched = 0;
+let state = null, volumeTouched = 0, keepLogText = false;
 
 function errorText(err, name) {
   if (!err) return "";
@@ -453,7 +492,7 @@ function renderStatus(s) {
   } else if (link.code === 0) {
     head = T("idle");
     sub = s.saved.length ? T("idle_sub_saved") : T("idle_sub_new");
-    err = errorText(link.error, link.name || (s.saved[0] && s.saved[0].name) || T("speaker"));
+    err = errorText(link.error, link.name || (s.saved[0] && s.saved[0].name) || T("device"));
     dot = err ? "err" : "";
   } else if (link.code === 1) {
     head = T("calling", { n: name }); dot = "busy"; disconnect.hidden = false;
@@ -472,6 +511,7 @@ function renderStatus(s) {
   $("detail").textContent = sub;
   $("error").hidden = !err;
   $("error").textContent = err;
+  $("tip").hidden = link.code !== 7;
   if (Date.now() - volumeTouched > 3000) {
     $("vol").value = s.stream.volume;
     $("vol-v").textContent = s.stream.volume + "%";
@@ -493,7 +533,8 @@ function renderFound(s) {
   setHtml(ul, list.map((f) =>
     '<li><span class="ico">' + (f.audio ? "♪" : "•") + '</span><div class="name"><b>' + esc(f.name || T("unnamed")) + "</b><small>" + esc(f.addr) +
     (f.rssi ? " · " + f.rssi + " dBm" : "") + "</small></div>" +
-    '<div class="acts"><button class="primary" data-connect="' + esc(f.addr) + '">' + esc(T("connect")) + "</button></div></li>").join(""));
+    (s.link.code > 0 && s.link.addr === f.addr ? "" :
+      '<div class="acts"><button class="primary" data-connect="' + esc(f.addr) + '">' + esc(T("connect")) + "</button></div>") + "</li>").join(""));
 }
 
 function renderSaved(s) {
@@ -544,33 +585,6 @@ function renderNumbers(s) {
   setHtml($("numbers"), rows.map((r) => "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>").join(""));
 }
 
-function renderSource(s) {
-  const sel = $("source");
-  if (document.activeElement === sel) return;
-  const heard = {};
-  ((s.probe && s.probe.sources) || []).forEach((r) => { heard[r.source] = r.opened && r.level > 0; });
-  let html = "";
-  for (let i = 0; i < 8; i++) {
-    const note = i === 2 ? " (" + T("source_usual") + ")" : heard[i] ? " ♪" : "";
-    html += '<option value="' + i + '"' + (i === s.source ? " selected" : "") + ">" + i + esc(note) + "</option>";
-  }
-  setHtml(sel, html);
-}
-
-function renderProbe(s) {
-  const p = s.probe || { state: 0, sources: [] };
-  const btn = $("btn-probe");
-  btn.disabled = p.state === 1;
-  btn.textContent = p.state === 1 ? T("probe_running") : T("probe_run");
-  if (!p.sources.length) { setHtml($("probe"), ""); return; }
-  setHtml($("probe"), '<table class="probe"><tr><th>' + esc(T("probe_source")) + "</th><th>" + esc(T("probe_open")) +
-    "</th><th>" + esc(T("probe_rate")) + "</th><th>" + esc(T("probe_level")) + "</th></tr>" +
-    p.sources.map((r) => "<tr><td>" + r.source + (r.source === 2 ? " (Remote Play)" : "") + "</td><td>" +
-      esc(r.opened ? T("yes") : T("no") + " · " + r.result) + "</td><td>" + (r.opened ? Math.round(r.bytes_per_s / 1000) + " KB/s" : "—") +
-      "</td><td>" + (r.opened ? '<div class="bar"><i style="width:' + r.level + '%"></i></div>' + r.level + "%" : "—") +
-      "</td></tr>").join("") + "</table>");
-}
-
 async function refresh() {
   try {
     const r = await fetch("/api/state", { cache: "no-store" });
@@ -587,8 +601,135 @@ async function refresh() {
   renderSaved(state);
   renderAdapter(state);
   renderNumbers(state);
-  renderProbe(state);
-  renderSource(state);
+}
+
+/* ---------- diagnostics and reports ---------- */
+
+/* What "Copy diagnostics" and a report carry besides the log: the state, readable */
+function diagText() {
+  const s = state || {};
+  const a = s.adapter || {}, l = s.link || {}, st = s.stream || {};
+  return [
+    "BlueBird " + (s.version || "?") + " build " + (s.build || "?") + ", console language " + (s.lang || "?") + ", up " + (s.uptime || 0) + " s",
+    "Adapter: " + (a.present ? a.chip + " " + a.id + " at " + a.path + ", firmware " + a.firmware + ", buffers " + a.acl_bufs + " x " + a.acl_mtu + (a.clone ? ", CSR clone" : "") : "none") + " (state " + (s.bt || "?") + ")",
+    "Link: " + (l.state || "?") + (l.name ? ' "' + l.name + '" ' + l.addr : "") + (l.incoming ? ", it called" : "") + (l.error ? ", error: " + l.error : ""),
+    "Stream: " + (st.active ? st.rate + " Hz, bitpool " + st.bitpool + "/" + st.bitpool_max + ", " + st.frames_per_packet + " frames per packet" : "off") +
+      ", sent " + st.sent + ", dropped " + st.dropped + ", underruns " + st.underruns + ", buffered " + st.buffered_ms + " ms, volume " + st.volume + "%, capture " + st.capture,
+    "Saved devices: " + ((s.saved || []).map((p) => p.name + " " + p.addr).join("; ") || "none") + "; reconnect " + (s.auto ? "on" : "off"),
+    "Adapters seen: " + ((s.adapters || []).map((x) => x.id + " " + x.path).join("; ") || "none"),
+  ];
+}
+
+const REPORT_API = "https://omnipad-diagnostics.omnipad-diagnostics.workers.dev/v1/reports";
+const REPORT_LOG_MAX = 200 * 1024, REPORT_MSG_MAX = 2048, REPORT_TRIES = 3;
+const utf8 = new TextEncoder();
+let reportBusy = false, reportDone = false;
+const byteLen = (s) => utf8.encode(s).length;
+/* The first max bytes, never splitting a character */
+function keepStart(s, max) {
+  if (byteLen(s) <= max) return s;
+  return new TextDecoder().decode(utf8.encode(s).slice(0, max)).replace(/�+$/, "");
+}
+/* The last max bytes, from a whole line */
+function keepEnd(s, max) {
+  if (byteLen(s) <= max) return s;
+  const tail = new TextDecoder().decode(utf8.encode(s).slice(-max));
+  const nl = tail.indexOf("\n");
+  return nl >= 0 ? tail.slice(nl + 1) : tail;
+}
+/* The end of the log, up to max bytes, read in the 32 KB pages /api/log serves */
+async function reportLog(max) {
+  const first = await fetch("/api/log", { cache: "no-store" });
+  const firstText = await first.text();
+  const end = Number(first.headers.get("X-Log-Offset")) || 0;
+  if (end <= byteLen(firstText)) return keepEnd(firstText, max);
+  const from = Math.max(0, end - max);
+  let at = from, text = "";
+  while (at < end) {
+    const res = await fetch("/api/log?since=" + at, { cache: "no-store" });
+    const chunk = await res.text();
+    const next = Number(res.headers.get("X-Log-Offset")) || at;
+    if (!chunk || next <= at) break;
+    text += chunk;
+    at = next;
+  }
+  if (from > 0) text = text.slice(text.indexOf("\n") + 1);
+  return keepEnd(text, max);
+}
+function logFirmware(log) {
+  const all = [...log.matchAll(/main: firmware ([0-9]+\.[0-9]+) \(0x/g)];
+  return all.length ? all[all.length - 1][1] : "";
+}
+function reportSay(text, kind) {
+  $("report-status").textContent = text;
+  $("report-status").className = "report-msg" + (kind ? " " + kind : "");
+}
+function openReport() {
+  $("report-box").hidden = false;
+  reportDone = false;
+  $("btn-report-send").disabled = false;
+  reportSay("", "");
+  $("report-code").hidden = $("report-code-hint").hidden = true;
+  $("report-msg").focus();
+}
+/* Sent only when the person presses Send; the API is OmniPad's, told which app sent it */
+async function sendReport() {
+  if (reportBusy || reportDone) return;
+  reportBusy = true;
+  $("btn-report-send").disabled = true;
+  reportSay(T("report_sending"), "");
+  try {
+    let log = "";
+    try { log = await reportLog(REPORT_LOG_MAX); } catch (e) { log = ""; }
+    const body = {
+      app: "bluebird",
+      log,
+      diagnostics: diagText().join("\n"),
+      version: String((state && state.version) || ""),
+      build: String((state && state.build) || ""),
+      firmware: logFirmware(log),
+      message: keepStart($("report-msg").value.trim(), REPORT_MSG_MAX),
+    };
+    for (let i = 0; i < REPORT_TRIES; i++) {
+      const res = await fetch(REPORT_API, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify(body) });
+      let data = {};
+      try { data = await res.json(); } catch (e) { /* no JSON body */ }
+      if (res.status === 201 && data.code) {
+        reportSay("", "");
+        $("report-code-text").textContent = data.code;
+        $("btn-report-copy").textContent = T("report_copy");
+        $("report-code").hidden = $("report-code-hint").hidden = false;
+        reportDone = true;
+        $("report-msg").value = "";
+        return;
+      }
+      if (res.status === 413 && body.log) {   /* too big: keep the newer half of the log */
+        body.log = keepEnd(body.log, Math.floor(byteLen(body.log) / 2));
+        continue;
+      }
+      reportSay(res.status === 429 ? T("report_later") : data.error === "daily_limit" ? T("report_tomorrow") : T("report_fail"), "bad");
+      return;
+    }
+    reportSay(T("report_fail"), "bad");
+  } catch (e) {
+    reportSay(T("report_fail"), "bad");   /* no internet, or the browser blocked the request */
+  } finally {
+    reportBusy = false;
+    $("btn-report-send").disabled = reportDone;
+  }
+}
+
+/* Clipboard where the browser allows it, a selection otherwise (plain http on the console) */
+async function copyText(text, el) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* not on plain http */ }
+  try {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    return document.execCommand("copy");
+  } catch (e) { return false; }
 }
 
 async function loadLog() {
@@ -616,16 +757,20 @@ $("auto").onchange = (e) => post("/api/auto?on=" + (e.target.checked ? 1 : 0));
 $("prefer").onchange = (e) => post("/api/adapter?prefer=" + encodeURIComponent(e.target.value));
 $("vol").oninput = (e) => { volumeTouched = Date.now(); $("vol-v").textContent = e.target.value + "%"; };
 $("vol").onchange = (e) => { volumeTouched = Date.now(); post("/api/volume?v=" + e.target.value); };
-$("diag").ontoggle = () => { if ($("diag").open) loadLog(); };
+$("diag").ontoggle = () => { if ($("diag").open && !keepLogText) loadLog(); keepLogText = false; };
 $("btn-log").onclick = loadLog;
-$("btn-probe").onclick = async () => { await post("/api/probe"); refresh(); };
-$("source").onchange = async (e) => { await post("/api/source?s=" + e.target.value); refresh(); };
+$("btn-report").onclick = openReport;
+$("btn-report-close").onclick = () => { $("report-box").hidden = true; };
+$("btn-report-send").onclick = sendReport;
+$("btn-report-copy").onclick = async () => {
+  if (await copyText($("report-code-text").textContent, $("report-code-text"))) $("btn-report-copy").textContent = T("report_copied");
+};
 $("btn-copy").onclick = async () => {
-  const log = await loadLog();
-  const text = "BlueBird diagnostics\n```json\n" + JSON.stringify(state, null, 1) + "\n```\n```\n" +
-    log.split("\n").slice(-200).join("\n") + "\n```\n";
-  try { await navigator.clipboard.writeText(text); toast(T("copied")); }
-  catch (e) { $("log").textContent = text; toast(T("copy_fail")); }
+  const log = await reportLog(48 * 1024).catch(() => "");
+  const text = "BlueBird diagnostics\n```\n" + diagText().join("\n") + "\n```\n```\n" + log.split("\n").slice(-200).join("\n") + "\n```\n";
+  if (!$("diag").open) { keepLogText = true; $("diag").open = true; }
+  $("log").textContent = text;
+  toast((await copyText(text, $("log"))) ? T("copied") : T("copy_fail"));
 };
 Object.entries(LANG_NAMES).forEach(([code, name]) => $("langSel").add(new Option(name, code)));
 $("langSel").onchange = (e) => {
@@ -633,7 +778,7 @@ $("langSel").onchange = (e) => {
   langFromConsole = true;
   save("bluebird.lang", lang);
   applyText();
-  if (state) { [$("found"), $("saved"), $("adapter"), $("numbers"), $("probe"), $("source")].forEach((el) => { el.dataset.html = ""; }); refresh(); }
+  if (state) { [$("found"), $("saved"), $("adapter"), $("numbers")].forEach((el) => { el.dataset.html = ""; }); refresh(); }
 };
 applyText();
 refresh();
