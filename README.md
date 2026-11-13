@@ -7,7 +7,7 @@ Play your PS5's game and system sound on a Bluetooth speaker or headphones, thro
 - **Your own adapter, never the console's radio.** The DualSense keeps the PS5's Bluetooth to itself and works as usual.
 - **Plug and play adapters.** Realtek RTL8761B sticks (TP-Link UB500 and friends) get their firmware from BlueBird; generic "CSR 4.0" dongles work as they are.
 - **Pair once.** Next time, switch the speaker on and BlueBird calls it by itself.
-- **A simple dashboard** in the Media tab, or on your phone at `http://<PS5_IP>:8120`.
+- **A simple dashboard** in the Media tab, or on your phone at `http://<PS5_IP>:8120`, in English, Portuguese, Spanish, French, German, Russian and Japanese.
 
 > **Status: 0.1.0, first build.** Everything was tested on a PC against a simulated adapter and speaker. It has not been run on a PS5 yet.
 

@@ -47,7 +47,7 @@ make test
 export PS5_PAYLOAD_SDK=/opt/ps5-payload-sdk && make
 ```
 
-Both must pass, and the payload build must have **no warnings**. If you changed `web/index.html`, also check that its `<script>` parses with `node --check` and look at the page in the browser pane with `python tools/mock_dashboard.py`.
+Both must pass, and the payload build must have **no warnings**. If you changed `web/index.html`, also check that its `<script>` parses with `node --check` and look at the page in the browser pane with `python tools/mock_dashboard.py`. `make test` checks that every language of the page has every text.
 
 What the gate does not cover: it never runs on a PS5. `tests/test_host_sim.c` plays a speaker written from the specifications, not a real one. A green gate is required, but it does not prove that a real speaker pairs or that the console's audio is captured.
 

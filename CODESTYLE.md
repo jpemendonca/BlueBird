@@ -5,7 +5,7 @@ Only rules you can check by reading a diff go here.
 ## Language
 
 - Everything in the project is in English: code, identifiers, comments, log lines, test names, docs, commit messages and releases. The one exception is `docs/COMECE_AQUI.md`, the Portuguese getting-started guide.
-- Notifications go in every language of `src/ui_text.c` (English, Portuguese, Spanish, French, German, Russian, Japanese); `make test` fails if a language lacks a text or changes its arguments. The dashboard has Portuguese and English (`I18N.pt`, `I18N.en`).
+- Text the user reads goes in every language the app has: English, Portuguese, Spanish, French, German, Russian and Japanese. Notifications use the table in `src/ui_text.c`, the dashboard its `I18N` table; `make test` fails if a language lacks a text or changes its arguments or `{placeholders}` (`tools/check_i18n.py`).
 - Commit messages: a Conventional Commits prefix in English (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`), then the description in English.
 
 ## Comments
@@ -56,8 +56,8 @@ ioctl(d->fd, USB_FS_INIT, &init);   // result ignored
 ## Dashboard (`web/index.html`)
 
 - One self-contained file, no external requests, no build step. The build embeds it into the payload.
-- Every visible string goes in both `I18N.pt` and `I18N.en`.
-- New elements must work in the light theme, the dark theme, at phone width, and in TV mode (`html.tv`).
+- Every visible string goes in every language of `I18N`.
+- The page has one theme, light, in the icon's blue; it ignores the system's dark mode. New elements must work at phone width and in TV mode (`html.tv`).
 - Lists go through `setHtml`, never `innerHTML` on every poll: the console's browser loses the controller's focus on a rebuild.
 
 ## Tests

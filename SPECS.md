@@ -55,7 +55,7 @@ One link, one sink.
 
 ## 5. Dashboard and API (`src/web.c`)
 
-Port 8120 (8090 is HearBridge, 8095 Dump Forge, 8105 OmniPad). One request per connection. The routes are listed in `src/web.h`. The page is one file, no external requests, Portuguese and English, phone, desktop and TV (`?tv=1`). Lists are rebuilt only when they change, so the controller's focus stays put in the console's browser.
+Port 8120 (8090 is HearBridge, 8095 Dump Forge, 8105 OmniPad). One request per connection. The routes are listed in `src/web.h`. The page is one file, no external requests, light theme only, in seven languages (a picker in the header; the choice is kept in the browser, otherwise the console's language), phone, desktop and TV (`?tv=1`). Lists are rebuilt only when they change, so the controller's focus stays put in the console's browser.
 
 ## 6. Files on the console
 

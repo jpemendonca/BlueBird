@@ -8,21 +8,19 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231f6feb'/%3E%3Cellipse cx='40' cy='58' rx='22' ry='18' fill='%23fff'/%3E%3Ccircle cx='55' cy='41' r='11' fill='%23fff'/%3E%3Cpath d='M64 38l10 4-10 4z' fill='%23ffc43d'/%3E%3Cpath d='M22 56L6 46l4 16z' fill='%23fff'/%3E%3C/svg%3E">
 <style>
 :root {
-  --bg: #071433; --bg2: #0b1d4a; --card: #102659; --card-edge: #1d3a7a; --ink: #f2f6ff; --mute: #9fb3dd;
-  --blue: #2f7bff; --blue-2: #1f5fe0; --sky: #58a6ff; --on-blue: #ffffff; --chip: #17306b;
-  --green: #3ddc84; --amber: #ffc43d; --red: #ff6b6b;
-  --hero-1: #2f7bff; --hero-2: #2347b8;
-  --shadow: 0 10px 30px rgba(0, 0, 0, .35);
-}
-@media (prefers-color-scheme: light) {
-  :root:not(.tv) { --bg: #eaf1ff; --bg2: #dce8ff; --card: #ffffff; --card-edge: #cfdcf7; --ink: #0d1b3e; --mute: #4d628f;
-    --chip: #eef3ff; --green: #14a35a; --amber: #b07800; --red: #d63c3c; --shadow: 0 8px 24px rgba(31, 95, 224, .12); }
+  --bg: #eaf1ff; --bg2: #d3e3ff; --card: #ffffff; --card-edge: #d4e1fa; --ink: #0d1b3e; --mute: #4d628f;
+  --blue: #2f7bff; --blue-2: #1f5fe0; --sky: #1f66e5; --on-blue: #ffffff; --chip: #eef3ff;
+  --green: #3ddc84; --amber: #ffc43d; --red: #d63c3c;
+  --hero-1: #3a86ff; --hero-2: #2453d6;
+  --shadow: 0 8px 24px rgba(31, 95, 224, .12);
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0; color: var(--ink); background: linear-gradient(180deg, var(--bg2), var(--bg) 340px) fixed, var(--bg);
   font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; min-height: 100vh; }
 main { max-width: 780px; margin: 0 auto; padding: 16px; }
+.lang-sel { margin-left: 8px; font-size: .85rem; font-weight: 600; padding: 6px 8px; }
 header { display: flex; align-items: center; gap: 12px; margin: 6px 0 18px; }
 header svg { width: 44px; height: 44px; flex: none; filter: drop-shadow(0 4px 10px rgba(47, 123, 255, .5)); }
 header h1 { font-size: 1.5rem; margin: 0; letter-spacing: .01em; }
@@ -103,6 +101,7 @@ html.tv button { padding: 14px 26px; }
     </svg>
     <h1>BlueBird</h1>
     <span class="ver" id="ver"></span>
+    <select class="lang-sel" id="langSel"></select>
   </header>
 
   <section class="hero" aria-live="polite">
@@ -166,8 +165,10 @@ html.tv button { padding: 14px 26px; }
 
 <script>
 "use strict";
+const LANG_NAMES = { en: "English", pt: "Português", es: "Español", fr: "Français", de: "Deutsch", ru: "Русский", ja: "日本語" };
 const I18N = {
   en: {
+    language: "Language",
     speaker: "Speaker", disconnect: "Disconnect", tone: "Test tone", volume: "Volume",
     search: "Find a speaker", scan: "Search", scanning: "Searching…",
     search_hint: "Put the speaker in pairing mode (usually: hold its Bluetooth button until the light blinks fast), then search.",
@@ -196,6 +197,7 @@ const I18N = {
     probe_source: "Source", probe_open: "Opened", probe_rate: "Data", probe_level: "Level", yes: "yes", no: "no",
   },
   pt: {
+    language: "Idioma",
     speaker: "Caixa de som", disconnect: "Desconectar", tone: "Tom de teste", volume: "Volume",
     search: "Achar uma caixa", scan: "Procurar", scanning: "Procurando…",
     search_hint: "Coloque a caixa em modo de pareamento (normalmente: segure o botão Bluetooth até a luz piscar rápido) e procure.",
@@ -223,11 +225,161 @@ const I18N = {
     probe_run: "Procurar o áudio do controle", probe_running: "Procurando… (15 s)",
     probe_source: "Fonte", probe_open: "Abriu", probe_rate: "Dados", probe_level: "Nível", yes: "sim", no: "não",
   },
+  es: {
+    language: "Idioma",
+    speaker: "Altavoz", disconnect: "Desconectar", tone: "Tono de prueba", volume: "Volumen",
+    search: "Buscar un altavoz", scan: "Buscar", scanning: "Buscando…",
+    search_hint: "Pon el altavoz en modo de emparejamiento (normalmente: mantén su botón Bluetooth hasta que la luz parpadee rápido) y busca.",
+    show_others: "Mostrar dispositivos que no son altavoces", saved: "Altavoces guardados", auto: "Reconectar solo el último altavoz",
+    adapter: "Adaptador Bluetooth", prefer: "Usar", any: "Cualquier adaptador", diagnostics: "Diagnóstico",
+    copy: "Copiar diagnóstico", reload_log: "Recargar registro", connect: "Conectar", forget: "Olvidar",
+    none_found: "Todavía no se encontró nada.", none_saved: "Aún no hay altavoces guardados. Busca uno arriba.",
+    no_adapter: "Conecta un adaptador Bluetooth USB a la PS5", no_adapter_sub: "BlueBird nunca usa el Bluetooth de la consola: lo conserva el DualSense.",
+    starting: "Iniciando el adaptador…", lost: "El adaptador dejó de responder", lost_sub: "Desconéctalo y vuelve a conectarlo.",
+    idle: "Ningún altavoz conectado", idle_sub_saved: "Enciende el altavoz: BlueBird lo llama cada pocos segundos, o pulsa Conectar abajo.",
+    idle_sub_new: "Busca abajo un altavoz en modo de emparejamiento.",
+    calling: "Llamando a {n}…", pairing: "Emparejando con {n}…", opening: "Abriendo el audio en {n}…",
+    ready: "{n} conectado", ready_sub: "Iniciando el sonido…",
+    playing: "Sonando en {n}", playing_sub: "SBC {rate} kHz, calidad {bp}",
+    copied: "Diagnóstico copiado", copy_fail: "No se pudo copiar: selecciona el texto de abajo",
+    chip: "Chip", id: "ID USB", address: "Dirección", firmware: "Firmware", buffers: "Búferes",
+    fw_loaded: "parche cargado", fw_rom: "solo ROM (no hay parche para este chip)", fw_none: "no hace falta",
+    clone_note: " (clon CSR)", sent: "Paquetes enviados", dropped: "Perdidos", underruns: "Faltas de audio",
+    buffered: "En el búfer", capture: "Captura de audio", bitpool: "Calidad (bitpool)", link: "Enlace",
+    err_answer: "{n} no respondió. Comprueba que está encendido, cerca y no conectado a un teléfono.",
+    err_pair: "El emparejamiento falló. Pon el altavoz en modo de emparejamiento y pulsa Conectar de nuevo.",
+    err_range: "El altavoz quedó fuera de alcance.", unnamed: "(sin nombre)", busy: "No es posible ahora",
+    probe_title: "Audio del mando (experimento)",
+    probe_hint: "El sonido que un juego envía al altavoz del mando es un flujo aparte. Esta prueba lo busca: abre un juego que suene en el mando, déjalo sonando y pulsa el botón. Tarda unos 15 s y el altavoz queda en silencio mientras tanto. Luego copia el diagnóstico y envíalo.",
+    probe_run: "Buscar el audio del mando", probe_running: "Buscando… (15 s)",
+    probe_source: "Fuente", probe_open: "Abrió", probe_rate: "Datos", probe_level: "Nivel", yes: "sí", no: "no",
+  },
+  fr: {
+    language: "Langue",
+    speaker: "Enceinte", disconnect: "Déconnecter", tone: "Son de test", volume: "Volume",
+    search: "Trouver une enceinte", scan: "Rechercher", scanning: "Recherche…",
+    search_hint: "Mettez l'enceinte en mode d'appairage (en général : maintenez son bouton Bluetooth jusqu'à ce que le voyant clignote vite), puis lancez la recherche.",
+    show_others: "Afficher les appareils qui ne sont pas des enceintes", saved: "Enceintes enregistrées", auto: "Reconnecter seul la dernière enceinte",
+    adapter: "Adaptateur Bluetooth", prefer: "Utiliser", any: "N'importe quel adaptateur", diagnostics: "Diagnostic",
+    copy: "Copier le diagnostic", reload_log: "Recharger le journal", connect: "Connecter", forget: "Oublier",
+    none_found: "Rien trouvé pour l'instant.", none_saved: "Aucune enceinte enregistrée. Recherchez-en une ci-dessus.",
+    no_adapter: "Branchez un adaptateur Bluetooth USB sur la PS5", no_adapter_sub: "BlueBird n'utilise jamais le Bluetooth de la console : la DualSense le garde.",
+    starting: "Démarrage de l'adaptateur…", lost: "L'adaptateur ne répond plus", lost_sub: "Débranchez-le puis rebranchez-le.",
+    idle: "Aucune enceinte connectée", idle_sub_saved: "Allumez l'enceinte : BlueBird l'appelle toutes les quelques secondes, ou appuyez sur Connecter ci-dessous.",
+    idle_sub_new: "Recherchez ci-dessous une enceinte en mode d'appairage.",
+    calling: "Appel de {n}…", pairing: "Appairage avec {n}…", opening: "Ouverture de l'audio sur {n}…",
+    ready: "{n} connectée", ready_sub: "Démarrage du son…",
+    playing: "Lecture sur {n}", playing_sub: "SBC {rate} kHz, qualité {bp}",
+    copied: "Diagnostic copié", copy_fail: "Copie impossible : sélectionnez le texte ci-dessous",
+    chip: "Puce", id: "ID USB", address: "Adresse", firmware: "Firmware", buffers: "Tampons",
+    fw_loaded: "correctif chargé", fw_rom: "ROM seule (pas de correctif pour cette puce)", fw_none: "inutile",
+    clone_note: " (clone CSR)", sent: "Paquets envoyés", dropped: "Perdus", underruns: "Manques d'audio",
+    buffered: "En tampon", capture: "Capture audio", bitpool: "Qualité (bitpool)", link: "Liaison",
+    err_answer: "{n} n'a pas répondu. Vérifiez qu'elle est allumée, proche et pas connectée à un téléphone.",
+    err_pair: "L'appairage a échoué. Mettez l'enceinte en mode d'appairage et appuyez de nouveau sur Connecter.",
+    err_range: "L'enceinte est hors de portée.", unnamed: "(sans nom)", busy: "Impossible pour le moment",
+    probe_title: "Son de la manette (expérience)",
+    probe_hint: "Le son qu'un jeu envoie au haut-parleur de la manette est un flux à part. Ce test le cherche : lancez un jeu qui joue du son sur la manette, laissez-le jouer et appuyez sur le bouton. Cela prend environ 15 s et l'enceinte se tait pendant ce temps. Copiez ensuite le diagnostic et envoyez-le.",
+    probe_run: "Chercher le son de la manette", probe_running: "Recherche… (15 s)",
+    probe_source: "Source", probe_open: "Ouverte", probe_rate: "Données", probe_level: "Niveau", yes: "oui", no: "non",
+  },
+  de: {
+    language: "Sprache",
+    speaker: "Lautsprecher", disconnect: "Trennen", tone: "Testton", volume: "Lautstärke",
+    search: "Lautsprecher finden", scan: "Suchen", scanning: "Suche läuft…",
+    search_hint: "Versetze den Lautsprecher in den Kopplungsmodus (meist: Bluetooth-Taste halten, bis das Licht schnell blinkt) und suche dann.",
+    show_others: "Geräte zeigen, die keine Lautsprecher sind", saved: "Gespeicherte Lautsprecher", auto: "Letzten Lautsprecher automatisch verbinden",
+    adapter: "Bluetooth-Adapter", prefer: "Verwenden", any: "Beliebiger Adapter", diagnostics: "Diagnose",
+    copy: "Diagnose kopieren", reload_log: "Protokoll neu laden", connect: "Verbinden", forget: "Entfernen",
+    none_found: "Noch nichts gefunden.", none_saved: "Noch kein Lautsprecher gespeichert. Suche oben nach einem.",
+    no_adapter: "Stecke einen USB-Bluetooth-Adapter in die PS5", no_adapter_sub: "BlueBird nutzt nie das Bluetooth der Konsole: Es bleibt beim DualSense.",
+    starting: "Adapter wird gestartet…", lost: "Der Adapter antwortet nicht mehr", lost_sub: "Abziehen und wieder einstecken.",
+    idle: "Kein Lautsprecher verbunden", idle_sub_saved: "Schalte den Lautsprecher ein: BlueBird ruft ihn alle paar Sekunden, oder tippe unten auf Verbinden.",
+    idle_sub_new: "Suche unten nach einem Lautsprecher im Kopplungsmodus.",
+    calling: "Rufe {n}…", pairing: "Kopple mit {n}…", opening: "Öffne den Ton auf {n}…",
+    ready: "{n} verbunden", ready_sub: "Ton startet…",
+    playing: "Wiedergabe auf {n}", playing_sub: "SBC {rate} kHz, Qualität {bp}",
+    copied: "Diagnose kopiert", copy_fail: "Kopieren nicht möglich: Markiere den Text unten",
+    chip: "Chip", id: "USB-ID", address: "Adresse", firmware: "Firmware", buffers: "Puffer",
+    fw_loaded: "Patch geladen", fw_rom: "nur ROM (kein Patch für diesen Chip)", fw_none: "nicht nötig",
+    clone_note: " (CSR-Klon)", sent: "Gesendete Pakete", dropped: "Verworfen", underruns: "Tonaussetzer",
+    buffered: "Im Puffer", capture: "Tonaufnahme", bitpool: "Qualität (Bitpool)", link: "Verbindung",
+    err_answer: "{n} hat nicht geantwortet. Prüfe, ob er an, in der Nähe und nicht mit einem Handy verbunden ist.",
+    err_pair: "Kopplung fehlgeschlagen. Versetze den Lautsprecher in den Kopplungsmodus und tippe erneut auf Verbinden.",
+    err_range: "Der Lautsprecher ist außer Reichweite.", unnamed: "(ohne Namen)", busy: "Gerade nicht möglich",
+    probe_title: "Ton des Controllers (Experiment)",
+    probe_hint: "Der Ton, den ein Spiel an den Controller-Lautsprecher schickt, ist ein eigener Strom. Dieser Test sucht ihn: Starte ein Spiel, das Ton am Controller abspielt, lass es laufen und drücke die Taste. Das dauert etwa 15 s, der Lautsprecher ist so lange still. Kopiere danach die Diagnose und schicke sie.",
+    probe_run: "Controller-Ton suchen", probe_running: "Suche… (15 s)",
+    probe_source: "Quelle", probe_open: "Geöffnet", probe_rate: "Daten", probe_level: "Pegel", yes: "ja", no: "nein",
+  },
+  ru: {
+    language: "Язык",
+    speaker: "Колонка", disconnect: "Отключить", tone: "Тестовый сигнал", volume: "Громкость",
+    search: "Найти колонку", scan: "Поиск", scanning: "Идёт поиск…",
+    search_hint: "Переведите колонку в режим сопряжения (обычно: удерживайте кнопку Bluetooth, пока индикатор не начнёт быстро мигать) и начните поиск.",
+    show_others: "Показывать устройства, которые не являются колонками", saved: "Сохранённые колонки", auto: "Подключать последнюю колонку автоматически",
+    adapter: "Bluetooth-адаптер", prefer: "Использовать", any: "Любой адаптер", diagnostics: "Диагностика",
+    copy: "Копировать диагностику", reload_log: "Обновить журнал", connect: "Подключить", forget: "Забыть",
+    none_found: "Пока ничего не найдено.", none_saved: "Сохранённых колонок пока нет. Найдите колонку выше.",
+    no_adapter: "Подключите USB-адаптер Bluetooth к PS5", no_adapter_sub: "BlueBird никогда не использует Bluetooth консоли: он остаётся у DualSense.",
+    starting: "Запуск адаптера…", lost: "Адаптер перестал отвечать", lost_sub: "Отключите и подключите его снова.",
+    idle: "Колонка не подключена", idle_sub_saved: "Включите колонку: BlueBird вызывает её каждые несколько секунд, или нажмите «Подключить» ниже.",
+    idle_sub_new: "Найдите ниже колонку в режиме сопряжения.",
+    calling: "Вызов {n}…", pairing: "Сопряжение с {n}…", opening: "Открытие звука на {n}…",
+    ready: "{n} подключена", ready_sub: "Запуск звука…",
+    playing: "Звук на {n}", playing_sub: "SBC {rate} кГц, качество {bp}",
+    copied: "Диагностика скопирована", copy_fail: "Не удалось скопировать: выделите текст ниже",
+    chip: "Чип", id: "USB ID", address: "Адрес", firmware: "Прошивка", buffers: "Буферы",
+    fw_loaded: "патч загружен", fw_rom: "только ROM (нет патча для этого чипа)", fw_none: "не нужна",
+    clone_note: " (клон CSR)", sent: "Отправлено пакетов", dropped: "Потеряно", underruns: "Пропуски звука",
+    buffered: "В буфере", capture: "Захват звука", bitpool: "Качество (bitpool)", link: "Связь",
+    err_answer: "{n} не ответила. Проверьте, что она включена, рядом и не подключена к телефону.",
+    err_pair: "Сопряжение не удалось. Переведите колонку в режим сопряжения и снова нажмите «Подключить».",
+    err_range: "Колонка вне зоны действия.", unnamed: "(без имени)", busy: "Сейчас недоступно",
+    probe_title: "Звук геймпада (эксперимент)",
+    probe_hint: "Звук, который игра отправляет на динамик геймпада, идёт отдельным потоком. Этот тест ищет его: запустите игру со звуком на геймпаде, оставьте её играть и нажмите кнопку. Это займёт около 15 с, колонка в это время молчит. Затем скопируйте диагностику и отправьте её.",
+    probe_run: "Найти звук геймпада", probe_running: "Поиск… (15 с)",
+    probe_source: "Источник", probe_open: "Открыт", probe_rate: "Данные", probe_level: "Уровень", yes: "да", no: "нет",
+  },
+  ja: {
+    language: "言語",
+    speaker: "スピーカー", disconnect: "切断", tone: "テスト音", volume: "音量",
+    search: "スピーカーを探す", scan: "検索", scanning: "検索中…",
+    search_hint: "スピーカーをペアリングモードにしてから検索してください(通常は Bluetooth ボタンをランプが速く点滅するまで長押し)。",
+    show_others: "スピーカー以外の機器も表示", saved: "保存済みのスピーカー", auto: "前回のスピーカーに自動で再接続",
+    adapter: "Bluetooth アダプター", prefer: "使用", any: "どのアダプターでも", diagnostics: "診断",
+    copy: "診断をコピー", reload_log: "ログを再読み込み", connect: "接続", forget: "削除",
+    none_found: "まだ見つかりません。", none_saved: "保存済みのスピーカーはありません。上で検索してください。",
+    no_adapter: "PS5 に USB Bluetooth アダプターを接続してください", no_adapter_sub: "BlueBird は本体の Bluetooth を使いません。DualSense がそのまま使います。",
+    starting: "アダプターを起動中…", lost: "アダプターが応答しません", lost_sub: "抜いてから挿し直してください。",
+    idle: "スピーカー未接続", idle_sub_saved: "スピーカーの電源を入れてください。BlueBird が数秒ごとに呼び出します。下の「接続」でも接続できます。",
+    idle_sub_new: "下でペアリングモードのスピーカーを検索してください。",
+    calling: "{n} を呼び出し中…", pairing: "{n} とペアリング中…", opening: "{n} の音声を開いています…",
+    ready: "{n} に接続済み", ready_sub: "音声を開始しています…",
+    playing: "{n} で再生中", playing_sub: "SBC {rate} kHz、品質 {bp}",
+    copied: "診断をコピーしました", copy_fail: "コピーできません。下のテキストを選択してください",
+    chip: "チップ", id: "USB ID", address: "アドレス", firmware: "ファームウェア", buffers: "バッファー",
+    fw_loaded: "パッチ読み込み済み", fw_rom: "ROM のみ(このチップのパッチなし)", fw_none: "不要",
+    clone_note: " (CSR 互換品)", sent: "送信パケット", dropped: "破棄", underruns: "音切れ",
+    buffered: "バッファー内", capture: "音声キャプチャ", bitpool: "品質 (bitpool)", link: "リンク",
+    err_answer: "{n} が応答しませんでした。電源が入っていて、近くにあり、スマホに接続されていないか確認してください。",
+    err_pair: "ペアリングに失敗しました。スピーカーをペアリングモードにして、もう一度「接続」を押してください。",
+    err_range: "スピーカーが範囲外になりました。", unnamed: "(名前なし)", busy: "今はできません",
+    probe_title: "コントローラーの音声 (実験)",
+    probe_hint: "ゲームがコントローラーのスピーカーに送る音は別のストリームです。このテストはそれを探します。コントローラーから音が出るゲームを再生したままボタンを押してください。約 15 秒かかり、その間スピーカーは無音になります。その後、診断をコピーして送ってください。",
+    probe_run: "コントローラーの音声を探す", probe_running: "検索中… (15 秒)",
+    probe_source: "ソース", probe_open: "開いた", probe_rate: "データ", probe_level: "レベル", yes: "はい", no: "いいえ",
+  },
 };
 const params = new URLSearchParams(location.search);
 if (params.has("tv")) document.documentElement.classList.add("tv");
-let lang = (navigator.language || "en").slice(0, 2) === "pt" ? "pt" : "en";
-let langFromConsole = false;
+/* The viewer's own choice wins; without one the page follows the console's language, then the
+ * browser's, then English. The choice is kept in this browser, as OmniPad does. */
+const load = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+const save = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* private mode */ } };
+const chosen = I18N[params.get("lang")] ? params.get("lang") : I18N[load("bluebird.lang", "")] ? load("bluebird.lang", "") : "";
+let lang = chosen || (I18N[(navigator.language || "").slice(0, 2)] ? navigator.language.slice(0, 2) : "en");
+let langFromConsole = !!chosen;
 const T = (k, vars) => {
   let s = (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k;
   for (const v in vars || {}) s = s.replace("{" + v + "}", vars[v]);
@@ -240,7 +392,9 @@ const setHtml = (el, html) => { if (el.dataset.html !== html) { el.dataset.html 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 function applyText() {
-  document.documentElement.lang = lang;
+  document.documentElement.lang = lang === "pt" ? "pt-BR" : lang;
+  $("langSel").value = lang;
+  $("langSel").setAttribute("aria-label", T("language"));
   document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = T(el.dataset.t); });
 }
 
@@ -397,7 +551,7 @@ async function refresh() {
   } catch (e) { return; }
   if (!langFromConsole && state.lang) {
     langFromConsole = true;
-    if (!params.has("lang")) lang = state.lang === "pt" ? "pt" : "en";
+    if (I18N[state.lang]) lang = state.lang;
     applyText();
   }
   $("ver").textContent = "v" + state.version + " · build " + state.build;
@@ -444,7 +598,14 @@ $("btn-copy").onclick = async () => {
   try { await navigator.clipboard.writeText(text); toast(T("copied")); }
   catch (e) { $("log").textContent = text; toast(T("copy_fail")); }
 };
-if (params.get("lang") === "pt" || params.get("lang") === "en") lang = params.get("lang");
+Object.entries(LANG_NAMES).forEach(([code, name]) => $("langSel").add(new Option(name, code)));
+$("langSel").onchange = (e) => {
+  lang = e.target.value;
+  langFromConsole = true;
+  save("bluebird.lang", lang);
+  applyText();
+  if (state) { [$("found"), $("saved"), $("adapter"), $("numbers"), $("probe")].forEach((el) => { el.dataset.html = ""; }); refresh(); }
+};
 applyText();
 refresh();
 setInterval(refresh, 1000);

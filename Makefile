@@ -37,6 +37,7 @@ test:
 	./$(BUILD)/test_host_sim
 	$(CC_HOST) $(HFLAGS) src/ui_text.c tests/test_ui_text.c -o $(BUILD)/test_ui_text
 	./$(BUILD)/test_ui_text
+	python3 tools/check_i18n.py
 
 clean:
 	rm -rf build

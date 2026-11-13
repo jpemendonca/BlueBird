@@ -21,6 +21,8 @@ O BlueBird nunca usa o Bluetooth do próprio PS5. Ele fica com o DualSense, que 
 
 Da próxima vez é só ligar a caixa. O BlueBird chama a última caixa sozinho.
 
+O painel abre no idioma do console. Para trocar, use o seletor de idioma no canto de cima.
+
 ## Sobre o som
 
 - A TV continua tocando também. Abaixe o volume na TV.
