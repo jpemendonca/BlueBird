@@ -47,6 +47,7 @@ static struct {
     volatile int want;
     long     unwanted_since;
     volatile int probe;         /* the dashboard asked for the capture source probe */
+    volatile int reopen;        /* the capture source changed: open the session again */
     int      capturing;
 } g_s = { .lock = PTHREAD_MUTEX_INITIALIZER, .volume = 100, .gain_q12 = 4096, .priming = 1 };
 
@@ -246,6 +247,15 @@ static void *capture_worker(void *arg)
     int told = 0;
     for (;;) {
         long now = now_ms();
+        if (g_s.reopen) {
+            g_s.reopen = 0;
+            if (g_s.capturing) {
+                log_line("stream: capture source changed to %d, opening the capture again", capture_source());
+                capture_close();
+                g_s.capturing = 0;
+            }
+            next_try = 0;
+        }
         if (g_s.probe) {
             /* The capture has one session: the stream gets silence while the probe runs */
             if (g_s.capturing) capture_close();
@@ -318,6 +328,12 @@ void stream_want_capture(int on)
 {
     g_s.want = on;
     if (on) start_capture_thread();
+}
+
+void stream_set_capture_source(int source)
+{
+    capture_set_source(source);
+    g_s.reopen = 1;
 }
 
 int stream_probe_capture(void)

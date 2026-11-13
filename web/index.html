@@ -159,6 +159,11 @@ html.tv button { padding: 14px 26px; }
       <p class="hint" data-t="probe_hint"></p>
       <div class="row"><button class="primary" id="btn-probe" data-t="probe_run"></button></div>
       <div id="probe"></div>
+      <div class="row">
+        <label for="source" data-t="source_used"></label>
+        <select id="source"></select>
+      </div>
+      <p class="hint" data-t="source_hint"></p>
       <pre id="log"></pre>
     </details>
   </section>
@@ -197,6 +202,7 @@ const I18N = {
     probe_hint: "The sound a game sends to the controller's speaker is a stream of its own. This test looks for it: open a game that plays sound on the controller, keep it playing, and press the button. It takes about 15 s and the speaker goes quiet meanwhile. Then copy the diagnostics and send them.",
     probe_run: "Look for the controller audio", probe_running: "Looking… (15 s)",
     probe_source: "Source", probe_open: "Opened", probe_rate: "Data", probe_level: "Level", yes: "yes", no: "no",
+    source_used: "Source used for the sound", source_hint: "Try 7: with a game playing sound on the controller, listen whether that sound now comes out of the headphones. 2 is the usual one.", source_usual: "usual",
   },
   pt: {
     language: "Idioma",
@@ -226,6 +232,7 @@ const I18N = {
     probe_hint: "O som que o jogo manda para o alto-falante do controle é um fluxo separado. Este teste procura onde ele está: abra um jogo que toca som no controle, deixe tocando e aperte o botão. Leva uns 15 s e a caixa fica muda nesse tempo. Depois copie o diagnóstico e me mande.",
     probe_run: "Procurar o áudio do controle", probe_running: "Procurando… (15 s)",
     probe_source: "Fonte", probe_open: "Abriu", probe_rate: "Dados", probe_level: "Nível", yes: "sim", no: "não",
+    source_used: "Fonte usada no som", source_hint: "Experimente a 7: com um jogo tocando som no controle, ouça se esse som passa a sair no fone. A 2 é a de sempre.", source_usual: "de sempre",
   },
   es: {
     language: "Idioma",
@@ -255,6 +262,7 @@ const I18N = {
     probe_hint: "El sonido que un juego envía al altavoz del mando es un flujo aparte. Esta prueba lo busca: abre un juego que suene en el mando, déjalo sonando y pulsa el botón. Tarda unos 15 s y el altavoz queda en silencio mientras tanto. Luego copia el diagnóstico y envíalo.",
     probe_run: "Buscar el audio del mando", probe_running: "Buscando… (15 s)",
     probe_source: "Fuente", probe_open: "Abrió", probe_rate: "Datos", probe_level: "Nivel", yes: "sí", no: "no",
+    source_used: "Fuente usada para el sonido", source_hint: "Prueba la 7: con un juego que suene en el mando, escucha si ese sonido sale ahora por los auriculares. La 2 es la habitual.", source_usual: "habitual",
   },
   fr: {
     language: "Langue",
@@ -284,6 +292,7 @@ const I18N = {
     probe_hint: "Le son qu'un jeu envoie au haut-parleur de la manette est un flux à part. Ce test le cherche : lancez un jeu qui joue du son sur la manette, laissez-le jouer et appuyez sur le bouton. Cela prend environ 15 s et l'enceinte se tait pendant ce temps. Copiez ensuite le diagnostic et envoyez-le.",
     probe_run: "Chercher le son de la manette", probe_running: "Recherche… (15 s)",
     probe_source: "Source", probe_open: "Ouverte", probe_rate: "Données", probe_level: "Niveau", yes: "oui", no: "non",
+    source_used: "Source utilisée pour le son", source_hint: "Essayez la 7 : avec un jeu qui joue du son sur la manette, écoutez si ce son sort maintenant dans le casque. La 2 est l'habituelle.", source_usual: "habituelle",
   },
   de: {
     language: "Sprache",
@@ -313,6 +322,7 @@ const I18N = {
     probe_hint: "Der Ton, den ein Spiel an den Controller-Lautsprecher schickt, ist ein eigener Strom. Dieser Test sucht ihn: Starte ein Spiel, das Ton am Controller abspielt, lass es laufen und drücke die Taste. Das dauert etwa 15 s, der Lautsprecher ist so lange still. Kopiere danach die Diagnose und schicke sie.",
     probe_run: "Controller-Ton suchen", probe_running: "Suche… (15 s)",
     probe_source: "Quelle", probe_open: "Geöffnet", probe_rate: "Daten", probe_level: "Pegel", yes: "ja", no: "nein",
+    source_used: "Quelle für den Ton", source_hint: "Probiere 7: Höre, ob der Ton, den ein Spiel am Controller abspielt, jetzt aus dem Kopfhörer kommt. 2 ist die übliche.", source_usual: "üblich",
   },
   ru: {
     language: "Язык",
@@ -342,6 +352,7 @@ const I18N = {
     probe_hint: "Звук, который игра отправляет на динамик геймпада, идёт отдельным потоком. Этот тест ищет его: запустите игру со звуком на геймпаде, оставьте её играть и нажмите кнопку. Это займёт около 15 с, колонка в это время молчит. Затем скопируйте диагностику и отправьте её.",
     probe_run: "Найти звук геймпада", probe_running: "Поиск… (15 с)",
     probe_source: "Источник", probe_open: "Открыт", probe_rate: "Данные", probe_level: "Уровень", yes: "да", no: "нет",
+    source_used: "Источник звука", source_hint: "Попробуйте 7: при игре со звуком на геймпаде послушайте, звучит ли он теперь в наушниках. 2 — обычный.", source_usual: "обычный",
   },
   ja: {
     language: "言語",
@@ -371,6 +382,7 @@ const I18N = {
     probe_hint: "ゲームがコントローラーのスピーカーに送る音は別のストリームです。このテストはそれを探します。コントローラーから音が出るゲームを再生したままボタンを押してください。約 15 秒かかり、その間スピーカーは無音になります。その後、診断をコピーして送ってください。",
     probe_run: "コントローラーの音声を探す", probe_running: "検索中… (15 秒)",
     probe_source: "ソース", probe_open: "開いた", probe_rate: "データ", probe_level: "レベル", yes: "はい", no: "いいえ",
+    source_used: "音声に使うソース", source_hint: "7 を試してください。コントローラーから音が出るゲームで、その音がヘッドホンから聞こえるか確認します。通常は 2 です。", source_usual: "通常",
   },
 };
 const params = new URLSearchParams(location.search);
@@ -532,6 +544,19 @@ function renderNumbers(s) {
   setHtml($("numbers"), rows.map((r) => "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>").join(""));
 }
 
+function renderSource(s) {
+  const sel = $("source");
+  if (document.activeElement === sel) return;
+  const heard = {};
+  ((s.probe && s.probe.sources) || []).forEach((r) => { heard[r.source] = r.opened && r.level > 0; });
+  let html = "";
+  for (let i = 0; i < 8; i++) {
+    const note = i === 2 ? " (" + T("source_usual") + ")" : heard[i] ? " ♪" : "";
+    html += '<option value="' + i + '"' + (i === s.source ? " selected" : "") + ">" + i + esc(note) + "</option>";
+  }
+  setHtml(sel, html);
+}
+
 function renderProbe(s) {
   const p = s.probe || { state: 0, sources: [] };
   const btn = $("btn-probe");
@@ -563,6 +588,7 @@ async function refresh() {
   renderAdapter(state);
   renderNumbers(state);
   renderProbe(state);
+  renderSource(state);
 }
 
 async function loadLog() {
@@ -593,6 +619,7 @@ $("vol").onchange = (e) => { volumeTouched = Date.now(); post("/api/volume?v=" +
 $("diag").ontoggle = () => { if ($("diag").open) loadLog(); };
 $("btn-log").onclick = loadLog;
 $("btn-probe").onclick = async () => { await post("/api/probe"); refresh(); };
+$("source").onchange = async (e) => { await post("/api/source?s=" + e.target.value); refresh(); };
 $("btn-copy").onclick = async () => {
   const log = await loadLog();
   const text = "BlueBird diagnostics\n```json\n" + JSON.stringify(state, null, 1) + "\n```\n```\n" +
@@ -606,7 +633,7 @@ $("langSel").onchange = (e) => {
   langFromConsole = true;
   save("bluebird.lang", lang);
   applyText();
-  if (state) { [$("found"), $("saved"), $("adapter"), $("numbers"), $("probe")].forEach((el) => { el.dataset.html = ""; }); refresh(); }
+  if (state) { [$("found"), $("saved"), $("adapter"), $("numbers"), $("probe"), $("source")].forEach((el) => { el.dataset.html = ""; }); refresh(); }
 };
 applyText();
 refresh();

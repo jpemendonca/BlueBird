@@ -6,6 +6,11 @@
 /* The console's audio, as Remote Play gets it, through libSceAvcap2: 48 kHz stereo. The NIDs,
  * the open parameters and the format checks come from HearBridge-PS5 (see docs/THIRD_PARTY.md). */
 
+/* The source field the stream opens the capture with (0..7; 2, the Remote Play mix, by default).
+ * Taken at the next open. */
+void capture_set_source(int source);
+int  capture_source(void);
+
 /* The rights the payload started with, tried last when opening the capture (0: none). */
 void capture_set_payload_authid(uint64_t authid);
 

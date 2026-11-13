@@ -207,6 +207,10 @@ static void handle(int fd)
         respond_ok(fd, ok);
     } else if (!strcmp(target, "/api/probe")) {
         respond_ok(fd, stream_probe_capture());
+    } else if (!strcmp(target, "/api/source")) {
+        int ok = query_get(query, "s", v, sizeof(v)) && v[0] >= '0' && v[0] <= '7' && !v[1];
+        if (ok) speaker_set_capture_source(v[0] - '0');
+        respond_ok(fd, ok);
     } else if (!strcmp(target, "/api/tone")) {
         speaker_test_tone();
         respond_ok(fd, 1);

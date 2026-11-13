@@ -20,6 +20,18 @@ typedef struct {
 } probe_t;
 static probe_t g_probe[PROBE_SOURCES];
 static volatile int g_probe_state;  /* 0 never run, 1 running, 2 done */
+static volatile int g_use_source = 2;  /* the source the stream opens: 2, the Remote Play mix */
+
+void capture_set_source(int source)
+{
+    if (source < 0 || source >= PROBE_SOURCES) source = 2;
+    g_use_source = source;
+}
+
+int capture_source(void)
+{
+    return g_use_source;
+}
 
 int capture_probe_json(char *out, int n)
 {
@@ -221,6 +233,8 @@ int capture_open(void)
 {
     if (g.handle) return 1;
     if (!load_libs()) return 0;
+    g.source = (uint32_t)g_use_source;
+    log_line("capture: opening source %d%s", g_use_source, g_use_source == 2 ? " (Remote Play mix)" : " (experiment)");
     uint64_t authid = kernel_get_ucred_authid(-1);
     uint8_t caps[16];
     int have_caps = kernel_get_ucred_caps(-1, caps) == 0;
@@ -332,7 +346,7 @@ int capture_probe(void)
         log_line("capture: source %d: %.0f B/s, %d%% non-zero words, %s, level %d%%", src, r->bytes_per_s,
                  r->nonzero, r->s16 ? "int16" : "float32", r->level);
     }
-    g.source = 2;
+    g.source = (uint32_t)g_use_source;
     g_probe_state = 2;
     snprintf(g_status, sizeof(g_status), "probe done");
     log_line("capture: probe done");
