@@ -16,7 +16,7 @@ Play your PS5's game and system sound on a Bluetooth speaker or headphones, thro
 1. Download `BlueBird.elf` from the latest release.
 2. Send it to your payload loader and start it. The notification "BlueBird … running" appears.
 3. Plug a USB Bluetooth adapter into the PS5. "Bluetooth adapter ready" appears.
-4. Open the **BlueBird** tile in the Media tab (or `http://<PS5_IP>:8120` on your phone).
+4. Open the **BlueBird** tile in the Media tab (or `http://<PS5_IP>:8120` on your phone). Opened while BlueBird is not running, the tile says how to start it, once it has been opened with BlueBird running.
 5. Put the speaker in pairing mode, press **Search**, then **Connect** next to it. "Playing on …" appears.
 
 The TV keeps its sound too: turn it down on the TV. The controller's own speaker keeps working, since nothing is plugged into the controller; with headphones, sounds the game sends to the controller still come from the controller. Diagnostics has an experiment, **Look for the controller audio**, to find that stream for a future headphone mode.

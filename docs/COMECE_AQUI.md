@@ -21,6 +21,8 @@ O BlueBird nunca usa o Bluetooth do próprio PS5. Ele fica com o DualSense, que 
 
 Da próxima vez é só ligar a caixa. O BlueBird chama a última caixa sozinho.
 
+Se você abrir o tile com o BlueBird parado, aparece uma página explicando que é preciso iniciar o BlueBird primeiro. Ela abre o painel sozinha quando o BlueBird responder. Essa página fica guardada no navegador do PS5 depois que você abre o tile uma vez com o BlueBird rodando.
+
 O painel abre no idioma do console. Para trocar, use o seletor de idioma no canto de cima.
 
 ## Sobre o som

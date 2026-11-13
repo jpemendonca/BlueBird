@@ -34,7 +34,10 @@ $(BUILD)/%.o: src/%.c $(HEADERS)
 $(GEN)/web_index.h: web/index.html tools/embed_web.py
 	@mkdir -p $(GEN)
 	python3 tools/embed_web.py $< $@ HTML_INDEX
-$(BUILD)/web.o: $(GEN)/web_index.h
+$(GEN)/web_start.h: web/start.html tools/embed_web.py
+	@mkdir -p $(GEN)
+	python3 tools/embed_web.py $< $@ HTML_START
+$(BUILD)/web.o: $(GEN)/web_index.h $(GEN)/web_start.h
 
 # The label and number are compiled in: a stamp rebuilds what shows them when they change
 $(GEN)/version.stamp: FORCE

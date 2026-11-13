@@ -57,6 +57,8 @@ One link, one sink.
 
 Port 8120 (8090 is HearBridge, 8095 Dump Forge, 8105 OmniPad). One request per connection. The routes are listed in `src/web.h`. The page is one file, no external requests, light theme only, in seven languages (a picker in the header; the choice is kept in the browser, otherwise the console's language), phone, desktop and TV (`?tv=1`). Lists are rebuilt only when they change, so the controller's focus stays put in the console's browser.
 
+The tile opens `/start` (`web/start.html`), not the panel. Its AppCache manifest (`/bluebird.appcache`, changed with the page) lets the console's browser keep it, so the tile still shows something when BlueBird is not running: the page asks `/ping` (XHR) and `/ping.gif` (an image) and opens the panel on the first answer, or says how to start BlueBird and asks again every 4 s. The browser only has the copy after the tile was opened once with BlueBird running. HearBridge found this; `file://` links did not open on the console. An installed tile keeps its old link, so a changed `param.json` is installed after an uninstall.
+
 ## 6. Files on the console
 
 | Path | What |

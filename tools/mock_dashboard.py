@@ -114,6 +114,14 @@ class Handler(BaseHTTPRequestHandler):
         u = urlparse(self.path)
         if u.path in ("/", "/index.html"):
             self.send(200, PAGE.read_bytes(), "text/html; charset=utf-8")
+        elif u.path == "/start":
+            self.send(200, (ROOT / "web" / "start.html").read_bytes(), "text/html; charset=utf-8")
+        elif u.path == "/bluebird.appcache":
+            self.send(200, "CACHE MANIFEST\n# mock\n\nCACHE:\n/start\n\nNETWORK:\n*\n", "text/cache-manifest")
+        elif u.path == "/ping":
+            self.send(200, "bluebird-ok", "text/plain")
+        elif u.path == "/ping.gif":
+            self.send(200, bytes.fromhex("47494638396101000100800000000000ffffff21f90401000000002c00000000010001000002024401003b"), "image/gif")
         elif u.path == "/api/state":
             self.send(200, json.dumps(state()))
         elif u.path == "/api/log":

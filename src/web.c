@@ -6,6 +6,7 @@
 #include "log.h"
 #include "util.h"
 #include "web_index.h"  /* generated from web/index.html by tools/embed_web.py */
+#include "web_start.h"  /* generated from web/start.html */
 
 #include <errno.h>
 #include <fcntl.h>
@@ -38,6 +39,28 @@ static void write_all(int fd, const void *buf, size_t len)
         p += w;
         len -= (size_t)w;
     }
+}
+
+/* Answers that the browser may keep: the tile's start page and its AppCache manifest. A no-store
+ * answer can stop WebKit caching them (HearBridge). */
+static void respond_cacheable(int fd, const char *type, const void *body, size_t len)
+{
+    char hdr[256];
+    int n = snprintf(hdr, sizeof(hdr), "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %zu\r\nConnection: close\r\n\r\n",
+                     type, len);
+    write_all(fd, hdr, (size_t)n);
+    write_all(fd, body, len);
+}
+
+/* The start page's manifest. Its comment changes with the page, so WebKit refreshes its copy. */
+static void send_manifest(int fd)
+{
+    uint32_t h = 2166136261u;
+    for (size_t i = 0; i < HTML_START_LEN; i++) h = (h ^ (uint8_t)HTML_START[i]) * 16777619u;
+    char m[200];
+    int n = snprintf(m, sizeof(m), "CACHE MANIFEST\n# BlueBird %s build %d start page %08x\n\nCACHE:\n/start\n\nNETWORK:\n*\n",
+                     BB_VERSION, BB_BUILD, (unsigned)h);
+    respond_cacheable(fd, "text/cache-manifest", m, (size_t)n);
 }
 
 static void respond(int fd, int code, const char *type, const char *extra, const void *body, size_t len)
@@ -152,6 +175,18 @@ static void handle(int fd)
 
     if (!strcmp(target, "/") || !strcmp(target, "/index.html")) {
         respond(fd, 200, "text/html; charset=utf-8", NULL, HTML_INDEX, HTML_INDEX_LEN);
+    } else if (!strcmp(target, "/start")) {
+        respond_cacheable(fd, "text/html; charset=utf-8", HTML_START, HTML_START_LEN);
+    } else if (!strcmp(target, "/bluebird.appcache")) {
+        send_manifest(fd);
+    } else if (!strcmp(target, "/ping")) {
+        respond(fd, 200, "text/plain", NULL, "bluebird-ok", 11);
+    } else if (!strcmp(target, "/ping.gif")) {
+        static const unsigned char gif[] = {
+            0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x01, 0x00, 0x01, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0xff, 0xff, 0xff, 0x21, 0xf9, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00, 0x2c, 0x00, 0x00, 0x00, 0x00,
+            0x01, 0x00, 0x01, 0x00, 0x00, 0x02, 0x02, 0x44, 0x01, 0x00, 0x3b };
+        respond(fd, 200, "image/gif", NULL, gif, sizeof(gif));
     } else if (!strcmp(target, "/api/state")) {
         send_state(fd);
     } else if (!strcmp(target, "/api/log")) {

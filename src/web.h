@@ -3,6 +3,9 @@
 
 /* The dashboard: the page and its HTTP API on `port`, served from its own thread.
  *   GET  /                 the page (web/index.html)
+ *   GET  /start            the tile's page (web/start.html), kept by the browser through
+ *                          /bluebird.appcache: it opens / when BlueBird answers /ping or /ping.gif,
+ *                          and says how to start BlueBird when it does not
  *   GET  /api/state        adapter, speaker, stream, search results, saved speakers
  *   GET  /api/log          the last 32 KB of the log; ?since=<offset> for what follows it
  *   POST /api/scan         search for speakers
