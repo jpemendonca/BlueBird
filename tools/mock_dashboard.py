@@ -47,6 +47,7 @@ def tick():
     now = time.time()
     if S["scanning"] and now >= S["scan_until"]:
         S["scanning"] = False
+        S["found"] = list(FOUND)
         log("host: search done")
     if S["scanning"]:
         n = int((now - (S["scan_until"] - 12)) / 2)
@@ -70,7 +71,7 @@ def state():
         streaming = S["link"]["code"] == 7
         sent = S["link"]["media_sent"]
         return {
-            "version": "0.1.0", "build": 1, "lang": "pt", "port": 8120, "uptime": int(time.time() - START),
+            "version": "1.0.0", "build": 8, "lang": "pt", "port": 8120, "uptime": int(time.time() - START),
             "bt": S["bt"], "adapter": S["adapter"],
             "adapters": [{"path": "/dev/ugen1.3", "id": "2357:0604", "in_use": True}] if S["adapter"]["present"] else [],
             "link": S["link"],

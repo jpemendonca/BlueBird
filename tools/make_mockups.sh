@@ -13,5 +13,5 @@ shot() {   # url, width, height, scale, output
     echo "$5"
 }
 shot "file:///$(cygpath -m "$PWD/tools/mockup.html")" 1600 1000 1 docs/images/mockup.png
-shot "http://localhost:8120/?lang=en" 820 1900 1 docs/images/dashboard.png
+shot "http://localhost:8120/?lang=en" 820 1180 1 docs/images/dashboard.png
 shot "file:///$(cygpath -m "$PWD/build/start_offline.html")" 1280 1000 1 docs/images/tile-not-running.png

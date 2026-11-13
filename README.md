@@ -39,9 +39,9 @@
 Portuguese guide: [docs/COMECE_AQUI.md](docs/COMECE_AQUI.md).
 
 <p align="center">
-  <img src="docs/images/dashboard.png" width="420" alt="The dashboard">
+  <img src="docs/images/dashboard.png" width="380" alt="The dashboard">
   &nbsp;
-  <img src="docs/images/tile-not-running.png" width="420" alt="The tile when BlueBird is not running">
+  <img src="docs/images/tile-not-running.png" width="380" alt="The tile when BlueBird is not running">
 </p>
 
 Opened while BlueBird is not running, the tile explains how to start it, and opens the dashboard by itself once BlueBird answers. The console's browser keeps that page after the tile was opened once with BlueBird running.
