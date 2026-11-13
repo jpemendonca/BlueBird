@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlueBird</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f6feb'/%3E%3Cpath d='M14 38c6-14 22-22 36-16-6 2-9 6-10 10 6 0 10 3 12 8-10-4-22 2-30 8 2-4 2-7 0-10z' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #0d1117; --card: #161b22; --edge: #30363d; --ink: #e6edf3; --mute: #8b949e;
+  --blue: #2f81f7; --blue-ink: #ffffff; --green: #3fb950; --amber: #d29922; --red: #f85149;
+  --chip: #21262d;
+}
+@media (prefers-color-scheme: light) {
+  :root:not(.tv) { --bg: #f6f8fa; --card: #ffffff; --edge: #d0d7de; --ink: #1f2328; --mute: #59636e;
+    --blue: #0969da; --green: #1a7f37; --amber: #9a6700; --red: #cf222e; --chip: #eef1f4; }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 760px; margin: 0 auto; padding: 16px; }
+header { display: flex; align-items: center; gap: 12px; margin: 4px 0 16px; }
+header svg { width: 40px; height: 40px; flex: none; }
+header h1 { font-size: 1.4rem; margin: 0; }
+header .ver { color: var(--mute); font-size: .85rem; margin-left: auto; }
+section { background: var(--card); border: 1px solid var(--edge); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+h2 { font-size: 1rem; margin: 0 0 10px; color: var(--mute); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.status { display: flex; gap: 14px; align-items: flex-start; }
+.dot { width: 14px; height: 14px; border-radius: 50%; margin-top: 7px; flex: none; background: var(--mute); }
+.dot.ok { background: var(--green); } .dot.busy { background: var(--amber); animation: pulse 1s infinite; }
+.dot.err { background: var(--red); }
+@keyframes pulse { 50% { opacity: .35; } }
+.big { font-size: 1.35rem; font-weight: 600; }
+.sub { color: var(--mute); margin-top: 2px; }
+.err-text { color: var(--red); margin-top: 6px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+button { font: inherit; border: 1px solid var(--edge); background: var(--chip); color: var(--ink);
+  border-radius: 8px; padding: 9px 16px; cursor: pointer; }
+button.primary { background: var(--blue); color: var(--blue-ink); border-color: var(--blue); }
+button.danger { color: var(--red); }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.vol { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.vol input { flex: 1; accent-color: var(--blue); }
+.vol span { min-width: 3.5em; text-align: right; color: var(--mute); }
+ul.list { list-style: none; margin: 0; padding: 0; }
+ul.list li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--edge); }
+ul.list li:first-child { border-top: 0; }
+ul.list .name { flex: 1; min-width: 0; }
+ul.list .name b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+ul.list .name small { color: var(--mute); }
+.empty { color: var(--mute); padding: 4px 0; }
+.hint { color: var(--mute); font-size: .92rem; margin: 8px 0 0; }
+label.toggle { display: flex; gap: 10px; align-items: center; margin-top: 12px; cursor: pointer; }
+label.toggle input { width: 20px; height: 20px; accent-color: var(--blue); }
+dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+dl.kv dt { color: var(--mute); } dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+select { font: inherit; background: var(--chip); color: var(--ink); border: 1px solid var(--edge); border-radius: 8px; padding: 8px; }
+details summary { cursor: pointer; color: var(--mute); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: 1rem; }
+pre { background: var(--bg); border: 1px solid var(--edge); border-radius: 8px; padding: 10px; max-height: 320px;
+  overflow: auto; font-size: .78rem; white-space: pre-wrap; word-break: break-word; }
+.toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: var(--bg);
+  padding: 10px 16px; border-radius: 8px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.on { opacity: 1; }
+html.tv body { font-size: 22px; }
+html.tv main { max-width: 1100px; }
+html.tv button { padding: 14px 24px; }
+@media (max-width: 480px) { .big { font-size: 1.15rem; } section { padding: 14px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1f6feb"/><path d="M14 38c6-14 22-22 36-16-6 2-9 6-10 10 6 0 10 3 12 8-10-4-22 2-30 8 2-4 2-7 0-10z" fill="#fff"/></svg>
+    <h1>BlueBird</h1>
+    <span class="ver" id="ver"></span>
+  </header>
+
+  <section aria-live="polite">
+    <h2 data-t="speaker"></h2>
+    <div class="status">
+      <div class="dot" id="dot"></div>
+      <div>
+        <div class="big" id="headline"></div>
+        <div class="sub" id="detail"></div>
+        <div class="err-text" id="error" hidden></div>
+      </div>
+    </div>
+    <div class="row" id="actions">
+      <button id="btn-disconnect" class="danger" data-t="disconnect" hidden></button>
+      <button id="btn-tone" data-t="tone" hidden></button>
+    </div>
+    <div class="vol">
+      <label for="vol" data-t="volume"></label>
+      <input type="range" id="vol" min="0" max="100" step="1">
+      <span id="vol-v"></span>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-t="search"></h2>
+    <p class="hint" data-t="search_hint"></p>
+    <div class="row"><button class="primary" id="btn-scan" data-t="scan"></button></div>
+    <ul class="list" id="found"></ul>
+    <label class="toggle" id="others-wrap" hidden><input type="checkbox" id="others"><span data-t="show_others"></span></label>
+  </section>
+
+  <section>
+    <h2 data-t="saved"></h2>
+    <ul class="list" id="saved"></ul>
+    <label class="toggle"><input type="checkbox" id="auto"><span data-t="auto"></span></label>
+  </section>
+
+  <section>
+    <h2 data-t="adapter"></h2>
+    <dl class="kv" id="adapter"></dl>
+    <div class="row" id="prefer-row" hidden>
+      <label for="prefer" data-t="prefer"></label>
+      <select id="prefer"></select>
+    </div>
+  </section>
+
+  <section>
+    <details id="diag">
+      <summary data-t="diagnostics"></summary>
+      <dl class="kv" id="numbers" style="margin-top:12px"></dl>
+      <div class="row"><button id="btn-copy" data-t="copy"></button><button id="btn-log" data-t="reload_log"></button></div>
+      <pre id="log"></pre>
+    </details>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const I18N = {
+  en: {
+    speaker: "Speaker", disconnect: "Disconnect", tone: "Test tone", volume: "Volume",
+    search: "Find a speaker", scan: "Search", scanning: "Searching…",
+    search_hint: "Put the speaker in pairing mode (usually: hold its Bluetooth button until the light blinks fast), then search.",
+    show_others: "Show devices that are not speakers", saved: "Saved speakers", auto: "Reconnect the last speaker by itself",
+    adapter: "Bluetooth adapter", prefer: "Use", any: "Any adapter", diagnostics: "Diagnostics",
+    copy: "Copy diagnostics", reload_log: "Reload log", connect: "Connect", forget: "Forget",
+    none_found: "Nothing found yet.", none_saved: "No saved speaker yet. Search for one above.",
+    no_adapter: "Plug a USB Bluetooth adapter into the PS5", no_adapter_sub: "BlueBird never uses the console's own Bluetooth: the DualSense keeps it.",
+    starting: "Starting the adapter…", lost: "The adapter stopped answering", lost_sub: "Unplug it and plug it in again.",
+    idle: "No speaker connected", idle_sub_saved: "Switch the speaker on: BlueBird calls it every few seconds, or press Connect below.",
+    idle_sub_new: "Search for a speaker in pairing mode below.",
+    calling: "Calling {n}…", pairing: "Pairing with {n}…", opening: "Opening audio on {n}…",
+    ready: "{n} connected", ready_sub: "Starting the sound…",
+    playing: "Playing on {n}", playing_sub: "{rate} kHz SBC, quality {bp}",
+    copied: "Diagnostics copied", copy_fail: "Could not copy: select the text below",
+    chip: "Chip", id: "USB id", address: "Address", firmware: "Firmware", buffers: "Buffers",
+    fw_loaded: "patch loaded", fw_rom: "ROM only (no patch for this chip)", fw_none: "none needed",
+    clone_note: " (CSR clone)", sent: "Packets sent", dropped: "Dropped", underruns: "Underruns",
+    buffered: "Buffered", capture: "Audio capture", bitpool: "Quality (bitpool)", link: "Link",
+    err_answer: "{n} did not answer. Check it is on, close by, and not connected to a phone.",
+    err_pair: "Pairing failed. Put the speaker in pairing mode and press Connect again.",
+    err_range: "The speaker went out of range.", unnamed: "(no name)", busy: "Not possible right now",
+  },
+  pt: {
+    speaker: "Caixa de som", disconnect: "Desconectar", tone: "Tom de teste", volume: "Volume",
+    search: "Achar uma caixa", scan: "Procurar", scanning: "Procurando…",
+    search_hint: "Coloque a caixa em modo de pareamento (normalmente: segure o botão Bluetooth até a luz piscar rápido) e procure.",
+    show_others: "Mostrar aparelhos que não são caixas", saved: "Caixas salvas", auto: "Reconectar sozinho a última caixa",
+    adapter: "Adaptador Bluetooth", prefer: "Usar", any: "Qualquer adaptador", diagnostics: "Diagnóstico",
+    copy: "Copiar diagnóstico", reload_log: "Recarregar log", connect: "Conectar", forget: "Esquecer",
+    none_found: "Nada encontrado ainda.", none_saved: "Nenhuma caixa salva ainda. Procure uma acima.",
+    no_adapter: "Plugue um adaptador Bluetooth USB no PS5", no_adapter_sub: "O BlueBird nunca usa o Bluetooth do console: ele fica com o DualSense.",
+    starting: "Ligando o adaptador…", lost: "O adaptador parou de responder", lost_sub: "Tire e plugue de novo.",
+    idle: "Nenhuma caixa conectada", idle_sub_saved: "Ligue a caixa: o BlueBird chama ela a cada poucos segundos, ou toque em Conectar abaixo.",
+    idle_sub_new: "Procure uma caixa em modo de pareamento abaixo.",
+    calling: "Chamando {n}…", pairing: "Pareando com {n}…", opening: "Abrindo o áudio em {n}…",
+    ready: "{n} conectada", ready_sub: "Começando o som…",
+    playing: "Tocando em {n}", playing_sub: "SBC {rate} kHz, qualidade {bp}",
+    copied: "Diagnóstico copiado", copy_fail: "Não deu para copiar: selecione o texto abaixo",
+    chip: "Chip", id: "ID USB", address: "Endereço", firmware: "Firmware", buffers: "Buffers",
+    fw_loaded: "patch carregado", fw_rom: "só ROM (sem patch para esse chip)", fw_none: "não precisa",
+    clone_note: " (clone CSR)", sent: "Pacotes enviados", dropped: "Perdidos", underruns: "Faltas de áudio",
+    buffered: "No buffer", capture: "Captura de áudio", bitpool: "Qualidade (bitpool)", link: "Link",
+    err_answer: "{n} não respondeu. Veja se está ligada, perto e sem estar conectada a um celular.",
+    err_pair: "O pareamento falhou. Coloque a caixa em modo de pareamento e toque em Conectar de novo.",
+    err_range: "A caixa saiu do alcance.", unnamed: "(sem nome)", busy: "Não dá agora",
+  },
+};
+const params = new URLSearchParams(location.search);
+if (params.has("tv")) document.documentElement.classList.add("tv");
+let lang = (navigator.language || "en").slice(0, 2) === "pt" ? "pt" : "en";
+let langFromConsole = false;
+const T = (k, vars) => {
+  let s = (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k;
+  for (const v in vars || {}) s = s.replace("{" + v + "}", vars[v]);
+  return s;
+};
+const $ = (id) => document.getElementById(id);
+/* Lists are rebuilt only when they change: a rebuild every second would take the focus away
+ * from a button the controller is on, in the console's browser */
+const setHtml = (el, html) => { if (el.dataset.html !== html) { el.dataset.html = html; el.innerHTML = html; } };
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function applyText() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = T(el.dataset.t); });
+}
+
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove("on"), 2200);
+}
+
+async function post(path) {
+  try {
+    const r = await fetch(path, { method: "POST" });
+    const j = await r.json();
+    if (!j.ok) toast(T("busy"));
+    return j.ok;
+  } catch (e) { toast(T("busy")); return false; }
+}
+
+let state = null, volumeTouched = 0;
+
+function errorText(err, name) {
+  if (!err) return "";
+  if (/did not answer/.test(err)) return T("err_answer", { n: name });
+  if (/pairing .*failed|authentication/i.test(err)) return T("err_pair");
+  if (/out of range/.test(err)) return T("err_range");
+  return err;
+}
+
+function renderStatus(s) {
+  const link = s.link, a = s.adapter, name = link.name || T("unnamed");
+  let dot = "", head = "", sub = "", err = "";
+  const disconnect = $("btn-disconnect"), tone = $("btn-tone");
+  disconnect.hidden = tone.hidden = true;
+  if (!a.present) {
+    head = s.bt === "adapter lost" ? T("lost") : T("no_adapter");
+    sub = s.bt === "adapter lost" ? T("lost_sub") : T("no_adapter_sub");
+    dot = s.bt === "adapter lost" ? "err" : "";
+  } else if (s.bt !== "ready") {
+    head = T("starting"); dot = "busy";
+  } else if (link.code === 0) {
+    head = T("idle");
+    sub = s.saved.length ? T("idle_sub_saved") : T("idle_sub_new");
+    err = errorText(link.error, link.name || (s.saved[0] && s.saved[0].name) || T("speaker"));
+    dot = err ? "err" : "";
+  } else if (link.code === 1) {
+    head = T("calling", { n: name }); dot = "busy"; disconnect.hidden = false;
+  } else if (link.code === 2) {
+    head = T("pairing", { n: name }); dot = "busy"; disconnect.hidden = false;
+  } else if (link.code < 6) {
+    head = T("opening", { n: name }); dot = "busy"; disconnect.hidden = false;
+  } else if (link.code === 6) {
+    head = T("ready", { n: name }); sub = T("ready_sub"); dot = "busy"; disconnect.hidden = false; tone.hidden = false;
+  } else {
+    head = T("playing", { n: name }); dot = "ok"; disconnect.hidden = false; tone.hidden = false;
+    if (s.stream.active) sub = T("playing_sub", { rate: (s.stream.rate / 1000).toFixed(s.stream.rate === 44100 ? 1 : 0), bp: s.stream.bitpool });
+  }
+  $("dot").className = "dot " + dot;
+  $("headline").textContent = head;
+  $("detail").textContent = sub;
+  $("error").hidden = !err;
+  $("error").textContent = err;
+  if (Date.now() - volumeTouched > 3000) {
+    $("vol").value = s.stream.volume;
+    $("vol-v").textContent = s.stream.volume + "%";
+  }
+}
+
+function renderFound(s) {
+  const showOthers = $("others").checked;
+  const list = s.found.filter((f) => f.audio || showOthers);
+  $("others-wrap").hidden = !s.found.some((f) => !f.audio);
+  const scan = $("btn-scan");
+  scan.disabled = s.scanning || s.bt !== "ready";
+  scan.textContent = s.scanning ? T("scanning") : T("scan");
+  const ul = $("found");
+  if (!list.length) {
+    setHtml(ul, s.scanning ? "" : '<li class="empty">' + esc(T("none_found")) + "</li>");
+    return;
+  }
+  setHtml(ul, list.map((f) =>
+    '<li><div class="name"><b>' + esc(f.name || T("unnamed")) + "</b><small>" + esc(f.addr) +
+    (f.rssi ? " · " + f.rssi + " dBm" : "") + "</small></div>" +
+    '<button class="primary" data-connect="' + esc(f.addr) + '">' + esc(T("connect")) + "</button></li>").join(""));
+}
+
+function renderSaved(s) {
+  const ul = $("saved");
+  if (!s.saved.length) {
+    setHtml(ul, '<li class="empty">' + esc(T("none_saved")) + "</li>");
+  } else {
+    setHtml(ul, s.saved.map((p) => {
+      const on = s.link.code > 0 && s.link.addr === p.addr;
+      return '<li><div class="name"><b>' + esc(p.name || T("unnamed")) + "</b><small>" + esc(p.addr) + "</small></div>" +
+        (on ? "" : '<button data-connect="' + esc(p.addr) + '">' + esc(T("connect")) + "</button>") +
+        '<button class="danger" data-forget="' + esc(p.addr) + '">' + esc(T("forget")) + "</button></li>";
+    }).join(""));
+  }
+  $("auto").checked = s.auto;
+}
+
+function renderAdapter(s) {
+  const a = s.adapter;
+  const rows = [];
+  if (a.present) {
+    rows.push([T("chip"), a.chip + (a.clone ? T("clone_note") : "")]);
+    rows.push([T("id"), a.id + " · " + a.path]);
+    if (a.address) rows.push([T("address"), a.address]);
+    rows.push([T("firmware"), a.firmware === 1 ? T("fw_loaded") : a.firmware === 0 ? T("fw_rom") : T("fw_none")]);
+    if (a.acl_bufs) rows.push([T("buffers"), a.acl_bufs + " × " + a.acl_mtu + " B"]);
+  } else {
+    rows.push([T("chip"), "—"]);
+  }
+  setHtml($("adapter"), rows.map((r) => "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>").join(""));
+  const ids = [...new Set(s.adapters.map((x) => x.id))];
+  $("prefer-row").hidden = ids.length < 2 && !a.prefer;
+  const sel = $("prefer");
+  if (document.activeElement !== sel) {
+    setHtml(sel, '<option value="">' + esc(T("any")) + "</option>" +
+      ids.map((id) => '<option value="' + esc(id) + '"' + (id === a.prefer ? " selected" : "") + ">" + esc(id) + "</option>").join(""));
+  }
+}
+
+function renderNumbers(s) {
+  const st = s.stream;
+  const rows = [
+    [T("link"), s.link.state + (s.link.incoming ? " (in)" : "")],
+    [T("sent"), st.sent], [T("dropped"), st.dropped], [T("underruns"), st.underruns],
+    [T("buffered"), st.buffered_ms + " ms"], [T("bitpool"), st.bitpool + " / " + st.bitpool_max],
+    [T("capture"), st.capture],
+  ];
+  setHtml($("numbers"), rows.map((r) => "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>").join(""));
+}
+
+async function refresh() {
+  try {
+    const r = await fetch("/api/state", { cache: "no-store" });
+    state = await r.json();
+  } catch (e) { return; }
+  if (!langFromConsole && state.lang) {
+    langFromConsole = true;
+    if (!params.has("lang")) lang = state.lang === "pt" ? "pt" : "en";
+    applyText();
+  }
+  $("ver").textContent = "v" + state.version + " · build " + state.build;
+  renderStatus(state);
+  renderFound(state);
+  renderSaved(state);
+  renderAdapter(state);
+  renderNumbers(state);
+}
+
+async function loadLog() {
+  try {
+    const r = await fetch("/api/log", { cache: "no-store" });
+    const text = await r.text();
+    const pre = $("log");
+    pre.textContent = text.split("\n").slice(-300).join("\n");
+    pre.scrollTop = pre.scrollHeight;
+    return text;
+  } catch (e) { return ""; }
+}
+
+document.addEventListener("click", async (ev) => {
+  const b = ev.target.closest("button");
+  if (!b) return;
+  if (b.dataset.connect) { await post("/api/connect?addr=" + encodeURIComponent(b.dataset.connect)); refresh(); }
+  else if (b.dataset.forget) { await post("/api/forget?addr=" + encodeURIComponent(b.dataset.forget)); refresh(); }
+});
+$("btn-scan").onclick = async () => { await post("/api/scan"); refresh(); };
+$("btn-disconnect").onclick = async () => { await post("/api/disconnect"); refresh(); };
+$("btn-tone").onclick = () => post("/api/tone");
+$("others").onchange = () => state && renderFound(state);
+$("auto").onchange = (e) => post("/api/auto?on=" + (e.target.checked ? 1 : 0));
+$("prefer").onchange = (e) => post("/api/adapter?prefer=" + encodeURIComponent(e.target.value));
+$("vol").oninput = (e) => { volumeTouched = Date.now(); $("vol-v").textContent = e.target.value + "%"; };
+$("vol").onchange = (e) => { volumeTouched = Date.now(); post("/api/volume?v=" + e.target.value); };
+$("diag").ontoggle = () => { if ($("diag").open) loadLog(); };
+$("btn-log").onclick = loadLog;
+$("btn-copy").onclick = async () => {
+  const log = await loadLog();
+  const text = "BlueBird diagnostics\n```json\n" + JSON.stringify(state, null, 1) + "\n```\n```\n" +
+    log.split("\n").slice(-200).join("\n") + "\n```\n";
+  try { await navigator.clipboard.writeText(text); toast(T("copied")); }
+  catch (e) { $("log").textContent = text; toast(T("copy_fail")); }
+};
+if (params.get("lang") === "pt" || params.get("lang") === "en") lang = params.get("lang");
+applyText();
+refresh();
+setInterval(refresh, 1000);
+</script>
+</body>
+</html>

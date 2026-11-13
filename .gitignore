@@ -1,0 +1,24 @@
+# Build output
+build/
+dist/
+*.elf
+*.o
+
+# Firmware blobs: tools/get-bt-firmware.sh downloads them
+firmware/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Editors and OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+*.swp
+*~
+
+# Local logs
+*.log

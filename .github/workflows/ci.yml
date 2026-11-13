@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Host tests
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq clang make
+          make test
+      - name: Dashboard script parses
+        run: |
+          python3 - <<'PY'
+          import re
+          html = open("web/index.html", encoding="utf-8").read()
+          scripts = re.findall(r"<script>(.*?)</script>", html, re.S)
+          open("/tmp/page.js", "w").write("\n".join(scripts))
+          PY
+          node --check /tmp/page.js
+
+  payload:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain and firmware
+        run: |
+          sudo apt-get update -qq
+          sudo sh tools/setup-wsl-toolchain.sh
+          sh tools/get-bt-firmware.sh
+      - name: Build without warnings
+        run: |
+          export PS5_PAYLOAD_SDK=/opt/ps5-payload-sdk
+          make 2>&1 | tee build.txt
+          ! grep -q "warning:" build.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BlueBird.elf
+          path: dist/BlueBird.elf

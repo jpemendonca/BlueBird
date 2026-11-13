@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bluebird-mock",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["tools/mock_dashboard.py", "8120"],
+      "port": 8120
+    }
+  ]
+}
