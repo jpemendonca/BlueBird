@@ -4,10 +4,10 @@
 #define BB_NAME        "BlueBird"
 /* Test builds pass their own label and number (make -f ps5.mk VERSION=... BUILD_NUM=...) */
 #ifndef BB_VERSION
-#define BB_VERSION     "0.1.0"
+#define BB_VERSION     "1.0.0"
 #endif
 #ifndef BB_BUILD
-#define BB_BUILD       1
+#define BB_BUILD       8
 #endif
 #define BB_DESCRIPTION "PS5 audio on Bluetooth speakers, through a USB Bluetooth adapter"
 

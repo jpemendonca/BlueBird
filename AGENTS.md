@@ -91,4 +91,4 @@ What the gate does not cover: it never runs on a PS5. `tests/test_host_sim.c` pl
 | `src/launcher.c` | The Media tab tile (`/user/app/BLBD00001`) |
 | `src/log.c`, `src/ui_text.c` | Log file and notifications; notification texts in seven languages |
 | `tests/` | Host tests (`make test`), the speaker simulator among them |
-| `tools/` | Toolchain setup, firmware download, embedder, mock dashboard, icon |
+| `tools/` | Toolchain setup, firmware download, embedder, mock dashboard, icon, README images (`make_mockups.sh`) |

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BlueBird mockup</title>
+<!-- The README's hero image: the dashboard (served by tools/mock_dashboard.py on port 8120) in a TV
+     browser frame and a phone frame. Screenshot it at 1600x1000 (tools/make_mockups.sh). -->
+<style>
+html, body { margin: 0; width: 1600px; height: 1000px; overflow: hidden; font-family: system-ui, "Segoe UI", Roboto, sans-serif; }
+body { background: radial-gradient(900px 600px at 15% 10%, #6aa5ff 0, transparent 60%),
+  radial-gradient(900px 700px at 90% 100%, #1d3fb0 0, transparent 60%), linear-gradient(135deg, #3a86ff, #2347b8); position: relative; }
+.title { position: absolute; left: 70px; top: 64px; color: #fff; }
+.title h1 { font-size: 64px; margin: 0; letter-spacing: .01em; display: flex; align-items: center; gap: 22px; }
+.title img { width: 92px; height: 92px; border-radius: 22px; box-shadow: 0 14px 30px rgba(0, 0, 0, .25); }
+.title p { font-size: 26px; margin: 14px 0 0; opacity: .92; max-width: 560px; line-height: 1.35; }
+.tv { position: absolute; left: 70px; top: 330px; width: 1000px; border-radius: 22px; background: #0d1b3e;
+  padding: 16px 16px 16px; box-shadow: 0 30px 60px rgba(0, 0, 0, .35); }
+.tv .bar { height: 26px; display: flex; gap: 8px; align-items: center; padding: 0 6px 10px; }
+.tv .bar i { width: 12px; height: 12px; border-radius: 50%; background: #ff6b6b; }
+.tv .bar i:nth-child(2) { background: #ffc43d; } .tv .bar i:nth-child(3) { background: #3ddc84; }
+.tv .bar span { margin-left: 14px; color: #9fb3dd; font-size: 15px; }
+.tv .screen { width: 968px; height: 532px; border-radius: 10px; overflow: hidden; background: #eaf1ff; }
+.tv iframe { width: 1210px; height: 665px; border: 0; transform: scale(.8); transform-origin: 0 0; }
+.phone { position: absolute; right: 90px; top: 70px; width: 410px; height: 860px; border-radius: 56px; background: #0b1530;
+  padding: 18px; box-shadow: 0 30px 70px rgba(0, 0, 0, .4); }
+.phone .screen { width: 374px; height: 824px; border-radius: 40px; overflow: hidden; background: #eaf1ff; position: relative; }
+.phone .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 120px; height: 30px; border-radius: 16px; background: #0b1530; z-index: 2; }
+.phone iframe { width: 374px; height: 824px; border: 0; }
+</style>
+</head>
+<body>
+  <div class="title">
+    <h1><img src="../assets/launcher/icon0.png" alt="">BlueBird</h1>
+    <p>PS5 game sound on your Bluetooth speaker or headphones, through a USB adapter.</p>
+  </div>
+  <div class="tv">
+    <div class="bar"><i></i><i></i><i></i><span>Media tab › BlueBird</span></div>
+    <div class="screen"><iframe src="http://localhost:8120/?lang=en&amp;tv=1"></iframe></div>
+  </div>
+  <div class="phone">
+    <div class="screen"><div class="notch"></div><iframe src="http://localhost:8120/?lang=pt"></iframe></div>
+  </div>
+</body>
+</html>

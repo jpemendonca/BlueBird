@@ -51,7 +51,7 @@ One link, one sink.
 - Pacing: one packet per packet duration (18.7 ms at bitpool 53 and MTU 895), at most 4 per turn; a stall over 200 ms restarts the clock.
 - Bitpool adaptation: packets dropped in a second lower the bitpool by 6, not below 29; 10 s without drops raise it by 2, up to the configured maximum.
 - Sink at 44.1 kHz: linear resampling from 48 kHz. Mono sink: L and R averaged.
-- The controller's speaker is not in the Remote Play mix: with BlueBird playing, the DualSense keeps its own sounds (PS5, 13 Nov). A headphone mode that brings them to the headset needs another capture source. `capture_probe` (Diagnostics, "Look for the controller audio") opens the capture with source values 0 to 7 for 1.5 s each and reports what each gives; source 2 is the Remote Play mix the stream uses. On the PS5 (13 Nov, Buds 2 playing) every source opened at about 380 KB/s; only 2 and 7 carried sound, at the same level, the others only zeros. The dashboard can stream from another source (`/api/source`, kept in `settings.txt`) to hear whether 7 carries the controller's sounds.
+- The controller's speaker is not in the Remote Play mix: what games send to the DualSense's speaker keeps playing there, headphones included. On the PS5 (13 Nov) the capture opened with source values 0 to 7: only 2 and 7 carried sound, the same mix, and neither had the controller's sounds. So there is no headphone mode; the dashboard and the docs tell how to turn the controller's speaker down in the system settings.
 
 ## 5. Dashboard and API (`src/web.c`)
 
@@ -59,11 +59,15 @@ Port 8120 (8090 is HearBridge, 8095 Dump Forge, 8105 OmniPad). One request per c
 
 The tile opens `/start` (`web/start.html`), not the panel. Its AppCache manifest (`/bluebird.appcache`, changed with the page) lets the console's browser keep it, so the tile still shows something when BlueBird is not running: the page asks `/ping` (XHR) and `/ping.gif` (an image) and opens the panel on the first answer, or says how to start BlueBird and asks again every 4 s. The browser only has the copy after the tile was opened once with BlueBird running. HearBridge found this; `file://` links did not open on the console. An installed tile keeps its old link, so a changed `param.json` is installed after an uninstall.
 
+## 5b. Reports
+
+**Send report** (dashboard, Help) posts the end of the log (up to 200 KB), the diagnostics text and the version, build and firmware to OmniPad's diagnostics API (`omnipad-diagnostics` on Cloudflare Workers, its `CONTRACT.md`), over HTTPS, with `"app": "bluebird"` so the maintainer tells the two apps apart. The page sends it directly from the browser; the payload sends nothing. A body too big is sent again with half the log. The answer's 4-character code is shown to copy. Nothing is sent until the person presses Send.
+
 ## 6. Files on the console
 
 | Path | What |
 |---|---|
-| `/data/bluebird/bluebird.log` | the log, kept across runs, moved to `.old` past 512 KB |
+| `/data/bluebird/bluebird.log` | the log, kept across runs, moved to `bluebird.log.old` past 1 MB (at start and while running), so at most about 2 MB |
 | `/data/bluebird/speakers.txt` | paired speakers: address, link key, last use, name |
 | `/data/bluebird/settings.txt` | volume, reconnect on/off, preferred adapter |
 | `/data/bluebird/bluebird.pid`, `stop` | the running copy, and the flag that asks it to stop. A copy that does not stop in 3 s is ended only if its pid still carries BlueBird's process name |
