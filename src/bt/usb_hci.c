@@ -38,6 +38,7 @@ static struct {
     pthread_mutex_t lock;
     uint32_t ids[BUS_MAX][DEV_MAX];
     uint32_t logged[BUS_MAX][DEV_MAX];
+    int      open_err[BUS_MAX][DEV_MAX];   /* the last open error logged for the node */
     char     failed[32];
     uint32_t failed_ids;
     char     current[32];
@@ -144,7 +145,7 @@ static int is_internal_radio(uint16_t vid)
 }
 
 /* The HCI interface (class E0/01/01): its event, ACL in and ACL out endpoints */
-static int find_hci_interface(int fd, dev_t_ *d)
+static int find_hci_interface(int fd, uint8_t ep_addr[EP_COUNT], uint16_t ep_mps[EP_COUNT])
 {
     uint8_t raw[1024];
     struct usb_gen_descriptor desc;
@@ -156,7 +157,7 @@ static int find_hci_interface(int fd, dev_t_ *d)
     if (len <= 0 || len > (int)sizeof(raw)) return 0;
 
     int in_hci = 0;
-    memset(d->ep_addr, 0, sizeof(d->ep_addr));
+    memset(ep_addr, 0, EP_COUNT);
     for (int off = 0; off + 2 <= len;) {
         int dl = raw[off];
         if (dl < 2 || off + dl > len) break;
@@ -170,14 +171,14 @@ static int find_hci_interface(int fd, dev_t_ *d)
             if (type == 0x03 && (addr & 0x80)) k = EP_EVT;
             else if (type == 0x02 && (addr & 0x80)) k = EP_ACL_IN;
             else if (type == 0x02) k = EP_ACL_OUT;
-            if (k >= 0 && !d->ep_addr[k]) {
-                d->ep_addr[k] = addr;
-                d->ep_mps[k] = mps;
+            if (k >= 0 && !ep_addr[k]) {
+                ep_addr[k] = addr;
+                ep_mps[k] = mps;
             }
         }
         off += dl;
     }
-    return d->ep_addr[EP_EVT] && d->ep_addr[EP_ACL_IN] && d->ep_addr[EP_ACL_OUT];
+    return ep_addr[EP_EVT] && ep_addr[EP_ACL_IN] && ep_addr[EP_ACL_OUT];
 }
 
 static int parse_prefer(const char *prefer, uint32_t *ids)
@@ -194,7 +195,10 @@ int usb_hci_find(const char *prefer, usb_hci_info_t *info)
     int has_want = parse_prefer(prefer, &want);
     int found_bus = -1, found_dev = -1, found_fd = -1;
     uint32_t found_ids = 0;
-    dev_t_ probe;
+    /* Only the endpoints here: the whole device state is 115 KB, and on the stack it brought the
+     * payload down as the worker thread started (PS5, 13 Nov) */
+    uint8_t ep_addr[EP_COUNT];
+    uint16_t ep_mps[EP_COUNT];
 
     /* The failed adapter is forgotten once it is unplugged, so plugging it in again retries it */
     if (g_bus.failed[0]) {
@@ -214,6 +218,12 @@ int usb_hci_find(const char *prefer, usb_hci_info_t *info)
             char path[32];
             snprintf(path, sizeof(path), "/dev/ugen%d.%d", bus, dev);
             int fd = open(path, O_RDWR | O_NONBLOCK);
+            if (fd < 0 && errno != ENOENT && errno != ENXIO && g_bus.open_err[bus][dev] != errno) {
+                g_bus.open_err[bus][dev] = errno;
+                log_line("bt: cannot open %s (%s)%s", path, strerror(errno),
+                         errno == EBUSY ? ": another app holds it, OmniPad for one" : "");
+            }
+            if (fd >= 0) g_bus.open_err[bus][dev] = 0;
             if (fd < 0) {
                 /* Held by another app (OmniPad, for one): keep what was last seen there */
                 if (errno != EBUSY) {
@@ -239,7 +249,11 @@ int usb_hci_find(const char *prefer, usb_hci_info_t *info)
                 close(fd);
                 continue;
             }
-            if (!find_hci_interface(fd, &probe)) {
+            if (!find_hci_interface(fd, ep_addr, ep_mps)) {
+                if (g_bus.logged[bus][dev] != ids) {
+                    g_bus.logged[bus][dev] = ids;
+                    log_line("bt: %04x:%04x on %s (class %02x) is not a Bluetooth adapter", vid, pid, path, dd.bDeviceClass);
+                }
                 close(fd);
                 continue;
             }
@@ -274,7 +288,7 @@ int usb_hci_find(const char *prefer, usb_hci_info_t *info)
     memset(&g_dev, 0, sizeof(g_dev));
     g_dev.fd = found_fd;
     g_dev.info = info;
-    find_hci_interface(found_fd, &g_dev);
+    find_hci_interface(found_fd, g_dev.ep_addr, g_dev.ep_mps);
     pthread_mutex_lock(&g_bus.lock);
     snprintf(g_bus.current, sizeof(g_bus.current), "%s", info->path);
     pthread_mutex_unlock(&g_bus.lock);

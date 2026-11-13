@@ -6,6 +6,12 @@
 #include <string.h>
 
 static char g_status[96] = "not started";
+static uint64_t g_payload_authid;
+
+void capture_set_payload_authid(uint64_t authid)
+{
+    g_payload_authid = authid;
+}
 
 const char *capture_status(void)
 {
@@ -55,8 +61,10 @@ static struct {
     int         auth_mode, read_flag, dead, restarts;
     float       buf[READ_BYTES / 4];
     int         fmt_checked, fmt_s16, nch, rate_done;
-    long        rate_t0, last_ok, last_restart;
+    long        rate_t0, last_ok, last_restart, stats_at;
     uint64_t    rate_bytes, reads_ok, reads_empty, reads_invalid;
+    uint64_t    win_ok, win_empty, win_frames;
+    int         win_peak;
 } g;
 
 static int libkernel(uint32_t *out)
@@ -100,11 +108,18 @@ static void set_authid(uint64_t authid)
              (unsigned long long)kernel_get_ucred_authid(-1));
 }
 
+/* Rights tried in turn: the ones we run with, Avcap2's own, a fallback, the payload's at start */
 static int open_and_start(int auth_mode)
 {
     uint8_t param[OPEN_PARAM_SIZE];
     if (auth_mode == 1) set_authid(AUTHID_AVCAP2);
     else if (auth_mode == 2) set_authid(AUTHID_FALLBACK);
+    else if (auth_mode == 3) {
+        if (!g_payload_authid) return 0;
+        set_authid(g_payload_authid);
+    }
+    log_line("capture: opening with rights %d (authid 0x%016llx)", auth_mode,
+             (unsigned long long)kernel_get_ucred_authid(-1));
 
     int rv = g.init();
     if (rv != 0) {
@@ -170,7 +185,7 @@ int capture_open(void)
     uint64_t authid = kernel_get_ucred_authid(-1);
     uint8_t caps[16];
     int have_caps = kernel_get_ucred_caps(-1, caps) == 0;
-    for (int mode = 0; mode <= 2; mode++) {
+    for (int mode = 0; mode <= 3; mode++) {
         if (open_and_start(mode)) {
             g.auth_mode = mode;
             g.read_flag = 1;
@@ -180,13 +195,16 @@ int capture_open(void)
             g.fmt_checked = g.rate_done = 0;
             g.rate_t0 = 0;
             g.rate_bytes = 0;
-            g.last_ok = g.last_restart = now_ms();
+            g.last_ok = g.last_restart = g.stats_at = now_ms();
+            g.win_ok = g.win_empty = g.win_frames = 0;
+            g.win_peak = 0;
             snprintf(g_status, sizeof(g_status), "capturing (rights %d)", mode);
             log_line("capture: session open (auth mode %d)", mode);
             return 1;
         }
     }
-    /* Back to the payload's own rights, so the USB adapter keeps working as before */
+    log_line("capture: no rights opened the session (%s)", g_status);
+    /* Back to the rights we started with, so the USB adapter keeps working as before */
     kernel_set_ucred_authid(-1, authid);
     if (have_caps) kernel_set_ucred_caps(-1, caps);
     return 0;
@@ -278,11 +296,29 @@ int capture_read(int16_t *out, int max_frames)
         }
         g.last_ok = now;
         g.reads_ok++;
+        g.win_ok++;
+        g.win_frames += (uint64_t)frames;
+        for (int i = 0; i < 2 * frames; i += 16) {
+            int v = out[i] < 0 ? -out[i] : out[i];
+            if (v > g.win_peak) g.win_peak = v;
+        }
+        if (g.reads_ok == 1) log_line("capture: first audio read, %d frames (%s, %d channels)", frames,
+                                      g.fmt_s16 ? "int16" : "float32", g.nch);
+        if (now - g.stats_at >= 10000) {
+            log_line("capture: last %ld s: %llu reads with audio, %llu empty, %llu frames (%.0f per s), peak %d%%",
+                     (now - g.stats_at) / 1000, (unsigned long long)g.win_ok, (unsigned long long)g.win_empty,
+                     (unsigned long long)g.win_frames, g.win_frames * 1000.0 / (double)(now - g.stats_at),
+                     g.win_peak * 100 / 32767);
+            g.stats_at = now;
+            g.win_ok = g.win_empty = g.win_frames = 0;
+            g.win_peak = 0;
+        }
         return frames;
     }
     unsigned code = (unsigned)got;
     if (code == AVCAP2_EMPTY || code == AVCAP2_OVERRUN || got == 0) {
         g.reads_empty++;
+        g.win_empty++;
         return 0;
     }
     if (code == AVCAP2_ENDED) {
@@ -294,6 +330,7 @@ int capture_read(int16_t *out, int max_frames)
     if (code == AVCAP2_INVALID) {
         /* Sticky after some system events: a restart clears it (HearBridge) */
         g.reads_invalid++;
+        if (g.reads_invalid <= 5) log_line("capture: invalid status from ReadAudio (%llu)", (unsigned long long)g.reads_invalid);
         if (now - g.last_ok > 800 && now - g.last_restart > 800 && g.restarts < 3) {
             g.restarts++;
             g.last_restart = now;

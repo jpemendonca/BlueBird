@@ -1,5 +1,6 @@
 #include "stream.h"
 #include "capture.h"
+#include "../ui_text.h"
 #include "../a2dp/media.h"
 #include "log.h"
 #include "util.h"
@@ -239,8 +240,9 @@ void stream_test_tone(int ms)
 static void *capture_worker(void *arg)
 {
     (void)arg;
-    int16_t pcm[2 * 2048];
+    static int16_t pcm[2 * 2048];
     long next_try = 0;
+    int told = 0;
     for (;;) {
         long now = now_ms();
         if (!g_s.want) {
@@ -261,8 +263,15 @@ static void *capture_worker(void *arg)
                 sleep_ms(100);
                 continue;
             }
+            log_step("opening the audio capture");
             g_s.capturing = capture_open();
+            log_step("capturing audio");
+            if (g_s.capturing) told = 0;
             if (!g_s.capturing) {
+                if (!told) {
+                    told = 1;
+                    notify_ps5("%s", ui_text(UI_CAPTURE_FAILED));
+                }
                 log_line("stream: audio capture did not open (%s), trying again in %d s", capture_status(),
                          CAPTURE_RETRY_MS / 1000);
                 next_try = now + CAPTURE_RETRY_MS;
@@ -273,6 +282,7 @@ static void *capture_worker(void *arg)
         if (n > 0) {
             stream_feed(pcm, n);
         } else if (n < 0) {
+            log_line("stream: the capture session ended, opening it again in 1 s");
             capture_close();
             g_s.capturing = 0;
             next_try = now + 1000;
@@ -287,11 +297,9 @@ void stream_want_capture(int on)
 {
     g_s.want = on;
     if (on && !g_s.thread_on) {
-        if (pthread_create(&g_s.thread, NULL, capture_worker, NULL) == 0) {
+        if (thread_start(&g_s.thread, capture_worker, NULL, "audio capture")) {
             pthread_detach(g_s.thread);
             g_s.thread_on = 1;
-        } else {
-            log_line("stream: capture thread not started");
         }
     }
 }

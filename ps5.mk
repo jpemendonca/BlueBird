@@ -8,7 +8,7 @@ ELF       := dist/BlueBird-$(VERSION)-b$(BUILD_NUM).elf
 BUILD     := build/ps5
 GEN       := $(BUILD)/gen
 
-CFLAGS    := -std=c11 -Wall -Wextra -O2 -Isrc -Isrc/bt -Isrc/a2dp -I$(GEN)
+CFLAGS    := -std=c11 -Wall -Wextra -Wframe-larger-than=8192 -O2 -Isrc -Isrc/bt -Isrc/a2dp -I$(GEN)
 CFLAGS    += -DBB_VERSION='"$(VERSION)"' -DBB_BUILD=$(BUILD_NUM)
 LDLIBS    += -lSceSystemService -lSceAppInstUtil
 

@@ -32,6 +32,7 @@ Only rules you can check by reading a diff go here.
 - Code that needs the PS5 goes inside `#ifdef __PROSPERO__`. It gets a host stub in `#else`, so the file still builds for host tests.
 - Logging: `log_line("<module>: ...")`, lower-case module prefix (`bt:`, `host:`, `stream:`, `speaker:`, `launcher:`). Log what happened and the values that explain it. Never log link keys.
 - No heap allocation in the worker's loop or the capture thread. Use static or caller-owned buffers.
+- No function frame over 8 KB: the build fails on it. Big buffers are static or global. Threads start with `thread_start`, never `pthread_create` directly.
 - Mutex scope: never hold `g_sp.lock` or `g_s.lock` while doing USB or HCI I/O.
 - Errors: functions return `0`/`1` (or `-1`/`0`) and log the cause where it happened. Don't push a failure on silently. A state that should never happen is logged too, never left to assert on the console.
 

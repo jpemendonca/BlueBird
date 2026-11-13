@@ -13,6 +13,14 @@ How BlueBird works and why. Each section is the contract for its area.
 
 The host (`src/a2dp/host.c`) is not thread-safe and only the worker calls it. No lock is held during USB or HCI I/O.
 
+Threads start through `thread_start` with a 512 KB stack and a name the log shows. The PS5's default thread stack is small: in build 1 a 115 KB structure on the worker's stack ended the payload a moment after it started. Both builds fail on a function frame over 8 KB (`-Wframe-larger-than=8192`).
+
+## 1b. Logs and notifications
+
+- Every log line carries the time and the thread's name. `main` logs the firmware, pid, rights and address; the worker logs every adapter it sees or cannot open, a heartbeat every 30 s, and the stream's numbers every 10 s while it plays; the capture logs its reads and peak level every 10 s; the dashboard logs every POST.
+- A crash (SIGSEGV, SIGBUS, SIGILL, SIGFPE, SIGABRT) writes the signal, the thread and the current step (`log_step`) to the log and shows a notification.
+- Notifications: running (first thing at start), adapter found, adapter ready, no adapter after 20 s, adapter failed, adapter unplugged, connecting (asked from the dashboard, or the first automatic call), paired, playing, disconnected, connection failed (asked from the dashboard), capture failed, stopped.
+
 ## 2. The adapter (`src/bt/usb_hci.c`)
 
 - Every `/dev/ugenX.Y` is opened in turn. A device of vendor `0e8d` or `1286` is closed right after its device descriptor is read: those are the console's radio.
@@ -55,7 +63,7 @@ Port 8120 (8090 is HearBridge, 8095 Dump Forge, 8105 OmniPad). One request per c
 | `/data/bluebird/bluebird.log` | the log, kept across runs, moved to `.old` past 512 KB |
 | `/data/bluebird/speakers.txt` | paired speakers: address, link key, last use, name |
 | `/data/bluebird/settings.txt` | volume, reconnect on/off, preferred adapter |
-| `/data/bluebird/bluebird.pid`, `stop` | the running copy, and the flag that asks it to stop |
+| `/data/bluebird/bluebird.pid`, `stop` | the running copy, and the flag that asks it to stop. A copy that does not stop in 3 s is ended only if its pid still carries BlueBird's process name |
 | `/user/app/BLBD00001` | the Media tab tile |
 
 ## 7. Tests

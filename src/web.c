@@ -147,6 +147,7 @@ static void handle(int fd)
     else query = none;
     int post = !strcmp(method, "POST");
     char v[64];
+    if (post) log_line("web: POST %s%s%s", target, query[0] ? "?" : "", query);
 
     if (!strcmp(target, "/") || !strcmp(target, "/index.html")) {
         respond(fd, 200, "text/html; charset=utf-8", NULL, HTML_INDEX, HTML_INDEX_LEN);
@@ -244,8 +245,7 @@ int web_init(int port, const char *log_path)
     if (g_web.fd < 0) return 0;
     g_web.started = now_ms();
     g_web.running = 1;
-    if (pthread_create(&g_web.thread, NULL, server, NULL) != 0) {
-        log_line("web: server thread not started");
+    if (!thread_start(&g_web.thread, server, NULL, "web server")) {
         g_web.running = 0;
         close(g_web.fd);
         return 0;

@@ -140,6 +140,7 @@ struct host {
     int      tx_head, tx_n;
 
     unsigned media_sent, media_dropped;
+    unsigned pairings;              /* link keys received: new pairings */
     char     last_error[96];
 };
 
@@ -1305,6 +1306,7 @@ static void on_event(host_t *h, const uint8_t *ev, int len)
     case 0x18:                              /* Link Key Notification */
         if (n >= 23) {
             store_put(p, l->used && memcmp(l->addr, p, 6) == 0 ? l->name : NULL, p + 6);
+            h->pairings++;
             log_line("host: paired with %s (key type %u), key stored", addr_s(p), p[22]);
         }
         break;
@@ -1632,5 +1634,6 @@ void host_status(const host_t *h, host_status_t *out)
     out->acl_free = h->credits;
     out->media_sent = h->media_sent;
     out->media_dropped = h->media_dropped;
+    out->pairings = h->pairings;
     snprintf(out->last_error, sizeof(out->last_error), "%s", h->last_error);
 }

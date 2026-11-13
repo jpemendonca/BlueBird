@@ -16,7 +16,7 @@ static int fake_send(void *ctx, uint16_t opcode, const uint8_t *params, int len)
 static void test_cmdq_flush_oneCredit_sendsOneCommand(void)
 {
     /* arrange */
-    bt_cmdq_t q;
+    static bt_cmdq_t q;
     bt_cmdq_reset(&q);
     nsent = 0;
     bt_cmdq_push(&q, 0x0401, NULL, 0);
@@ -32,7 +32,7 @@ static void test_cmdq_flush_oneCredit_sendsOneCommand(void)
 static void test_cmdq_onEvent_commandStatus_releasesNext(void)
 {
     /* arrange */
-    bt_cmdq_t q;
+    static bt_cmdq_t q;
     bt_cmdq_reset(&q);
     nsent = 0;
     bt_cmdq_push(&q, 0x0401, NULL, 0);
@@ -51,7 +51,7 @@ static void test_cmdq_onEvent_commandStatus_releasesNext(void)
 static void test_cmdq_push_full_refuses(void)
 {
     /* arrange */
-    bt_cmdq_t q;
+    static bt_cmdq_t q;
     bt_cmdq_reset(&q);
     for (int i = 0; i < BT_CMDQ_LEN; i++) bt_cmdq_push(&q, 0x0C03, NULL, 0);
 

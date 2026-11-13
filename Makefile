@@ -4,7 +4,7 @@
 
 BUILD := build/host
 CC_HOST := clang
-HFLAGS := -std=c11 -Wall -Wextra -Werror -O1 -g -Isrc -Isrc/bt -Isrc/a2dp -D_DEFAULT_SOURCE
+HFLAGS := -std=c11 -Wall -Wextra -Werror -Wframe-larger-than=8192 -O1 -g -Isrc -Isrc/bt -Isrc/a2dp -D_DEFAULT_SOURCE
 
 .PHONY: all ps5 test clean
 
@@ -33,7 +33,7 @@ test:
 	./$(BUILD)/test_media
 	$(CC_HOST) $(HFLAGS) src/a2dp/store.c $(BASE) tests/test_store.c -lpthread -o $(BUILD)/test_store
 	./$(BUILD)/test_store
-	$(CC_HOST) $(HFLAGS) $(A2DP) src/audio/stream.c src/audio/capture.c $(BASE) tests/test_host_sim.c -lpthread -lm -o $(BUILD)/test_host_sim
+	$(CC_HOST) $(HFLAGS) $(A2DP) src/audio/stream.c src/audio/capture.c src/ui_text.c $(BASE) tests/test_host_sim.c -lpthread -lm -o $(BUILD)/test_host_sim
 	./$(BUILD)/test_host_sim
 	$(CC_HOST) $(HFLAGS) src/ui_text.c tests/test_ui_text.c -o $(BUILD)/test_ui_text
 	./$(BUILD)/test_ui_text

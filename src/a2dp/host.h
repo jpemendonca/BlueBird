@@ -48,6 +48,7 @@ typedef struct {
     int      mtu;               /* the sink's media MTU, from HOST_READY */
     int      acl_mtu, acl_bufs, acl_free;
     unsigned media_sent, media_dropped;
+    unsigned pairings;          /* new pairings since the host opened */
     char     last_error[96];
 } host_status_t;
 

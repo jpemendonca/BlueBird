@@ -21,6 +21,8 @@
 #define SCAN_S            12
 #define USB_RESETS        2
 #define FOUND_MAX         24
+#define HEARTBEAT_MS      30000
+#define STREAM_STATS_MS   10000
 
 typedef struct {
     char     addr[18];
@@ -129,7 +131,9 @@ static void publish(host_t *h)
     pthread_mutex_unlock(&g_sp.lock);
 }
 
-static void call_last(host_t *h, long now, long *backoff)
+/* Calls the last speaker while nothing is linked. The first call after the adapter starts is
+ * told to the user; the retries are only logged. */
+static void call_last(host_t *h, long now, long *backoff, int *told)
 {
     store_entry_t last;
     if (!g_sp.auto_on || g_sp.user_dropped || host_scanning(h) || !store_last(&last)) return;
@@ -137,14 +141,35 @@ static void call_last(host_t *h, long now, long *backoff)
     host_status_t s;
     host_status(h, &s);
     if (s.state != HOST_IDLE) return;
-    log_line("speaker: calling the last speaker, %s", last.name[0] ? last.name : "(no name)");
+    const char *name = last.name[0] ? last.name : "?";
+    log_line("speaker: calling the last speaker, %s (next try in %ld s)", name, *backoff / 1000);
+    if (!*told) {
+        *told = 1;
+        notify_ps5(ui_text(UI_CONNECTING), name);
+    }
     host_connect(h, last.addr, last.name);
     g_sp.next_call_at = now + *backoff;
     *backoff = *backoff * 2 > RECALL_MAX_MS ? RECALL_MAX_MS : *backoff * 2;
 }
 
+/* One line now and then with everything that matters, so a log shows the state at any moment */
+static void heartbeat(host_t *h, const usb_hci_info_t *info)
+{
+    host_status_t s;
+    host_status(h, &s);
+    char st[512];
+    stream_status_json(st, sizeof(st));
+    store_entry_t saved[STORE_MAX];
+    int nsaved = store_list(saved, STORE_MAX);
+    log_line("speaker: heartbeat: adapter %s %04x:%04x, buffers %d/%d free, link %s \"%s\", sent %u dropped %u, "
+             "%d saved speaker(s), auto %s; stream %s",
+             info->chip, info->vid, info->pid, s.acl_free, s.acl_bufs, host_state_name(s.state), s.name,
+             s.media_sent, s.media_dropped, nsaved, g_sp.auto_on ? "on" : "off", st);
+}
+
 static void run_host(usb_hci_info_t *info)
 {
+    log_step("opening the Bluetooth host");
     host_events ev = { on_found, NULL, NULL, NULL };
     host_t *h = host_open(usb_hci_transport(), &ev, info->fake_csr);
     if (!h) {
@@ -154,13 +179,16 @@ static void run_host(usb_hci_info_t *info)
     pthread_mutex_lock(&g_sp.lock);
     g_sp.bt_state = "ready";
     pthread_mutex_unlock(&g_sp.lock);
-    log_line("speaker: ready on %s (%s)", info->chip, info->path);
+    log_line("speaker: ready on %s (%s, %04x:%04x, address %s)", info->chip, info->path, info->vid, info->pid,
+             info->address);
     notify_ps5(ui_text(UI_ADAPTER_READY), info->chip);
+    log_step("running the Bluetooth host");
 
-    long now = now_ms(), backoff = RECALL_MIN_MS, last_pub = 0;
+    long now = now_ms(), backoff = RECALL_MIN_MS, last_pub = 0, last_beat = now, last_stats = now;
     g_sp.next_call_at = now + FIRST_CALL_MS;
-    int prev = HOST_IDLE, played = 0;
-    char played_name[64] = "";
+    int prev = HOST_IDLE, played = 0, told_call = 0, asked = 0;
+    unsigned pairings = 0;
+    char played_name[64] = "", asked_name[64] = "";
     while (!g_sp.stop) {
         int scan, drop, restart;
         char connect[18];
@@ -173,12 +201,19 @@ static void run_host(usb_hci_info_t *info)
         g_sp.req_connect[0] = 0;
         if (scan) g_sp.nfound = 0;
         pthread_mutex_unlock(&g_sp.lock);
-        if (restart) break;
+        if (restart) {
+            log_line("speaker: restarting Bluetooth for another adapter choice");
+            break;
+        }
         if (drop) {
+            log_line("speaker: disconnect asked from the dashboard; no reconnecting until Connect is pressed");
             g_sp.user_dropped = 1;
             host_disconnect(h);
         }
-        if (scan && !host_scan(h, SCAN_S)) log_line("speaker: search not possible while a speaker is being set up");
+        if (scan) {
+            if (host_scan(h, SCAN_S)) log_line("speaker: search asked from the dashboard");
+            else log_line("speaker: search not possible while a speaker is being set up");
+        }
         if (connect[0]) {
             uint8_t a[6];
             char name[64] = "";
@@ -200,23 +235,36 @@ static void run_host(usb_hci_info_t *info)
                 host_status(h, &s);
                 if (s.state != HOST_IDLE && memcmp(s.addr, a, 6) != 0) {
                     /* Another speaker is on: drop it first, call this one when the link is down */
+                    log_line("speaker: %s asked while %s is linked: dropping that one first", connect, s.name);
                     host_disconnect(h);
                     pthread_mutex_lock(&g_sp.lock);
                     snprintf(g_sp.req_connect, sizeof(g_sp.req_connect), "%s", connect);
                     pthread_mutex_unlock(&g_sp.lock);
                 } else if (s.state == HOST_IDLE) {
+                    log_line("speaker: connect to %s \"%s\" asked from the dashboard", connect, name);
                     g_sp.user_dropped = 0;
                     backoff = RECALL_MIN_MS;
                     g_sp.next_call_at = now_ms() + RECALL_MIN_MS;
+                    asked = 1;
+                    snprintf(asked_name, sizeof(asked_name), "%s", name[0] ? name : connect);
+                    notify_ps5(ui_text(UI_CONNECTING), asked_name);
                     host_connect(h, a, name);
                 }
             }
         }
 
-        if (host_poll(h, stream_wait_ms(10)) < 0) break;
+        if (host_poll(h, stream_wait_ms(10)) < 0) {
+            log_line("speaker: the adapter stopped answering");
+            notify_ps5("%s", ui_text(UI_ADAPTER_GONE));
+            break;
+        }
 
         host_status_t s;
         host_status(h, &s);
+        if (s.pairings != pairings) {
+            pairings = s.pairings;
+            notify_ps5(ui_text(UI_PAIRED), s.name[0] ? s.name : "?");
+        }
         if (s.state != prev) {
             if (s.state == HOST_STREAMING) {
                 stream_start(&s.cfg, s.mtu);
@@ -225,6 +273,7 @@ static void run_host(usb_hci_info_t *info)
                 backoff = RECALL_MIN_MS;
                 if (!played || strcmp(played_name, s.name)) notify_ps5(ui_text(UI_SPEAKER_PLAYING), s.name[0] ? s.name : "?");
                 played = 1;
+                asked = 0;
                 snprintf(played_name, sizeof(played_name), "%s", s.name);
             } else if (prev == HOST_STREAMING) {
                 stream_stop();
@@ -232,7 +281,13 @@ static void run_host(usb_hci_info_t *info)
             if (s.state == HOST_IDLE && prev >= HOST_READY) {
                 notify_ps5(ui_text(UI_SPEAKER_LOST), played_name[0] ? played_name : "?");
                 played = 0;
+                told_call = 0;
                 g_sp.next_call_at = now_ms() + RECALL_MIN_MS;
+            } else if (s.state == HOST_IDLE && asked) {
+                /* A connection the user asked for failed: say so; the reason is on the dashboard */
+                log_line("speaker: the connection to %s failed: %s", asked_name, s.last_error);
+                notify_ps5(ui_text(UI_CONNECT_FAILED), asked_name);
+                asked = 0;
             }
             stream_want_capture(s.state >= HOST_READY);
             prev = s.state;
@@ -240,10 +295,20 @@ static void run_host(usb_hci_info_t *info)
         stream_tick(send_media, h);
 
         now = now_ms();
-        call_last(h, now, &backoff);
+        call_last(h, now, &backoff, &told_call);
         if (now - last_pub > 200) {
             last_pub = now;
             publish(h);
+        }
+        if (now - last_beat >= HEARTBEAT_MS) {
+            last_beat = now;
+            heartbeat(h, info);
+        }
+        if (s.state == HOST_STREAMING && now - last_stats >= STREAM_STATS_MS) {
+            last_stats = now;
+            char st[512];
+            stream_status_json(st, sizeof(st));
+            log_line("speaker: stream %s, adapter buffers %d/%d free", st, s.acl_free, s.acl_bufs);
         }
     }
     stream_stop();
@@ -264,9 +329,10 @@ static void set_bt_state(const char *st, int have)
 static void *worker(void *arg)
 {
     (void)arg;
-    long started = now_ms();
+    long started = now_ms(), last_none_log = 0;
     int told_none = 0, resets = 0;
     usb_hci_set_stop_flag(&g_sp.stop);
+    log_line("speaker: looking for a USB Bluetooth adapter every %d s", FIND_EVERY_MS / 1000);
     while (!g_sp.stop) {
         usb_hci_info_t info;
         char prefer[16];
@@ -274,9 +340,15 @@ static void *worker(void *arg)
         snprintf(prefer, sizeof(prefer), "%s", g_sp.prefer);
         g_sp.req_restart = 0;
         pthread_mutex_unlock(&g_sp.lock);
+        log_step("looking for an adapter");
         if (!usb_hci_find(prefer, &info)) {
             set_bt_state("looking for an adapter", 0);
-            if (!told_none && now_ms() - started > NO_ADAPTER_TELL_MS) {
+            long now = now_ms();
+            if (now - last_none_log >= 60000) {
+                last_none_log = now;
+                log_line("speaker: no usable Bluetooth adapter yet (%ld s since start)", (now - started) / 1000);
+            }
+            if (!told_none && now - started > NO_ADAPTER_TELL_MS) {
                 told_none = 1;
                 notify_ps5("%s", ui_text(UI_NO_ADAPTER));
             }
@@ -289,8 +361,15 @@ static void *worker(void *arg)
         g_sp.have_adapter = 1;
         g_sp.bt_state = "starting";
         pthread_mutex_unlock(&g_sp.lock);
+        char ids[16];
+        snprintf(ids, sizeof(ids), "%04x:%04x", info.vid, info.pid);
+        notify_ps5(ui_text(UI_ADAPTER_FOUND), ids);
 
+        log_step("starting the adapter");
+        long t0 = now_ms();
         int started_ok = usb_hci_start(LOCAL_NAME, &info);
+        log_line("speaker: adapter start %s in %ld ms (%s, firmware %d)", started_ok ? "done" : "failed",
+                 now_ms() - t0, info.chip[0] ? info.chip : "chip unknown", info.firmware);
         pthread_mutex_lock(&g_sp.lock);
         g_sp.info = info;
         pthread_mutex_unlock(&g_sp.lock);
@@ -298,8 +377,6 @@ static void *worker(void *arg)
             resets = 0;
             run_host(&info);
             usb_hci_diag();
-        } else {
-            log_line("speaker: adapter %04x:%04x did not start", info.vid, info.pid);
         }
         usb_hci_close();
         set_bt_state(g_sp.stop ? "stopped" : "adapter lost", 0);
@@ -316,6 +393,7 @@ static void *worker(void *arg)
         }
         sleep_ms(FIND_EVERY_MS);
     }
+    log_line("speaker: worker stopped");
     return NULL;
 }
 
@@ -327,10 +405,9 @@ int speaker_init(const char *settings_dir)
     store_init(path);
     stream_init();
     load_settings();
-    if (pthread_create(&g_sp.thread, NULL, worker, NULL) != 0) {
-        log_line("speaker: worker thread not started");
-        return 0;
-    }
+    log_line("speaker: settings: volume %d, reconnect %s, adapter %s", stream_volume(), g_sp.auto_on ? "on" : "off",
+             g_sp.prefer[0] ? g_sp.prefer : "any");
+    if (!thread_start(&g_sp.thread, worker, NULL, "bluetooth worker")) return 0;
     g_sp.running = 1;
     return 1;
 }

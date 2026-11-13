@@ -69,4 +69,40 @@ int hex_dump(const void *data, size_t len, char *out, size_t out_len)
     return (int)written;
 }
 
+#define THREAD_STACK (512 * 1024)
 
+typedef struct {
+    void *(*fn)(void *);
+    void *arg;
+    const char *name;
+} thread_boot_t;
+
+/* Names the thread for the log and crash reports, then runs it */
+static void *thread_boot(void *p)
+{
+    thread_boot_t b = *(thread_boot_t *)p;
+    free(p);
+    log_thread_name(b.name);
+    return b.fn(b.arg);
+}
+
+int thread_start(pthread_t *t, void *(*fn)(void *), void *arg, const char *name)
+{
+    thread_boot_t *b = malloc(sizeof(*b));
+    if (!b) return 0;
+    b->fn = fn;
+    b->arg = arg;
+    b->name = name;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    int set = pthread_attr_setstacksize(&attr, THREAD_STACK);
+    int err = pthread_create(t, &attr, thread_boot, b);
+    pthread_attr_destroy(&attr);
+    if (err != 0) {
+        free(b);
+        log_line("thread: %s not started (error %d)", name, err);
+        return 0;
+    }
+    log_line("thread: %s started (stack %s)", name, set == 0 ? "512 KB" : "default");
+    return 1;
+}

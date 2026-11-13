@@ -5,12 +5,18 @@
 #include <stddef.h>
 #include <stdarg.h>
 
+#include <pthread.h>
+
 long now_ms(void);
 uint64_t uptime_ms(void);
 void sleep_ms(int ms);
 uint32_t crc32_le(uint32_t crc, const uint8_t *buf, size_t len);
 uint64_t hex_to_u64(const char *s);
 int hex_dump(const void *data, size_t len, char *out, size_t out_len);
+
+/* Starts a thread with a 512 KB stack and logs it. The default on the PS5 is far smaller.
+ * Returns 1 on success. */
+int thread_start(pthread_t *t, void *(*fn)(void *), void *arg, const char *name);
 
 /* Byte order for the Bluetooth stack (src/bt): HCI, L2CAP and HID are little-endian, SDP big-endian */
 static inline unsigned le16(const unsigned char *p) { return (unsigned)p[0] | (unsigned)p[1] << 8; }

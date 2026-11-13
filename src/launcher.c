@@ -50,7 +50,7 @@ static int register_app(void)
     return sceAppInstUtilAppInstallAll(NULL);
 }
 
-static int install_tile(int port)
+int launcher_install(int port)
 {
     char param[512];
     int len = snprintf(param, sizeof(param),
@@ -88,22 +88,6 @@ static int install_tile(int port)
     log_line("launcher: BlueBird tile %s in the Media tab (opens http://127.0.0.1:%d/)",
              changed ? "installed" : "checked", port);
     return 1;
-}
-
-/* OmniPad installs its tile with these rights (PS5); the payload's own come back afterwards, so
- * the USB adapter and the audio capture see the rights they always had */
-int launcher_install(int port)
-{
-    uint64_t authid = kernel_get_ucred_authid(-1);
-    uint8_t caps[16], root_caps[16];
-    int have_caps = kernel_get_ucred_caps(-1, caps) == 0;
-    memset(root_caps, 0xff, sizeof(root_caps));
-    kernel_set_ucred_authid(-1, 0x4800000000010003ULL);
-    kernel_set_ucred_caps(-1, root_caps);
-    int ok = install_tile(port);
-    kernel_set_ucred_authid(-1, authid);
-    if (have_caps) kernel_set_ucred_caps(-1, caps);
-    return ok;
 }
 
 #else

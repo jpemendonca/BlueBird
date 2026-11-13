@@ -4,13 +4,21 @@
 /* The PS5 notifications, in the console's system language. English when it has no translation. */
 
 typedef enum {
-    UI_RUNNING,             /* %s version */
-    UI_RUNNING_IP,          /* %s version, %s IP, %d port */
-    UI_ADAPTER_READY,       /* %s chip */
+    UI_RUNNING,  /* %s version */
+    UI_RUNNING_IP,  /* %s version, %s IP, %d port */
+    UI_ADAPTER_FOUND,  /* %s adapter ids */
+    UI_ADAPTER_READY,  /* %s chip */
     UI_NO_ADAPTER,
     UI_ADAPTER_FAILED,
-    UI_SPEAKER_PLAYING,     /* %s speaker name */
-    UI_SPEAKER_LOST,        /* %s speaker name */
+    UI_ADAPTER_GONE,
+    UI_CONNECTING,  /* %s speaker */
+    UI_PAIRED,  /* %s speaker */
+    UI_SPEAKER_PLAYING,  /* %s speaker */
+    UI_SPEAKER_LOST,  /* %s speaker */
+    UI_CONNECT_FAILED,  /* %s speaker */
+    UI_CAPTURE_FAILED,
+    UI_STOPPED,
+    UI_CRASH,  /* %d signal */
     UI_COUNT
 } ui_msg_t;
 
