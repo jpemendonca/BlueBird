@@ -56,11 +56,13 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .vol input { flex: 1; accent-color: #fff; }
 .vol span { min-width: 3.5em; text-align: right; color: rgba(255, 255, 255, .85); }
 ul.list { list-style: none; margin: 0; padding: 0; }
-ul.list li { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-top: 1px solid var(--card-edge); }
+ul.list li { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 0; border-top: 1px solid var(--card-edge); }
 ul.list li:first-child { border-top: 0; }
 ul.list .ico { width: 38px; height: 38px; border-radius: 12px; flex: none; display: grid; place-items: center;
   background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #fff; font-size: 1.1rem; }
-ul.list .name { flex: 1; min-width: 0; }
+ul.list .name { flex: 1 1 150px; min-width: 0; }
+/* The buttons drop to their own line when the name would be squeezed (phone width) */
+ul.list .acts { display: flex; gap: 8px; margin-left: auto; }
 ul.list .name b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 ul.list .name small { color: var(--mute); }
 .empty { color: var(--mute); padding: 4px 0; }
@@ -85,7 +87,7 @@ pre { background: var(--bg); border: 1px solid var(--card-edge); border-radius: 
 html.tv body { font-size: 22px; }
 html.tv main { max-width: 1120px; }
 html.tv button { padding: 14px 26px; }
-@media (max-width: 480px) { .big { font-size: 1.25rem; } section { padding: 15px; border-radius: 16px; } }
+@media (max-width: 480px) { ul.list .acts { width: 100%; } ul.list .acts button { flex: 1; } .big { font-size: 1.25rem; } section { padding: 15px; border-radius: 16px; } }
 </style>
 </head>
 <body>
@@ -172,10 +174,10 @@ const I18N = {
     speaker: "Speaker", disconnect: "Disconnect", tone: "Test tone", volume: "Volume",
     search: "Find a speaker", scan: "Search", scanning: "Searching…",
     search_hint: "Put the speaker in pairing mode (usually: hold its Bluetooth button until the light blinks fast), then search.",
-    show_others: "Show devices that are not speakers", saved: "Saved speakers", auto: "Reconnect the last speaker by itself",
+    show_others: "Show devices that are not speakers", saved: "Saved devices", auto: "Reconnect the last speaker by itself",
     adapter: "Bluetooth adapter", prefer: "Use", any: "Any adapter", diagnostics: "Diagnostics",
     copy: "Copy diagnostics", reload_log: "Reload log", connect: "Connect", forget: "Forget",
-    none_found: "Nothing found yet.", none_saved: "No saved speaker yet. Search for one above.",
+    none_found: "Nothing found yet.", none_saved: "No saved device yet. Search for one above.",
     no_adapter: "Plug a USB Bluetooth adapter into the PS5", no_adapter_sub: "BlueBird never uses the console's own Bluetooth: the DualSense keeps it.",
     starting: "Starting the adapter…", lost: "The adapter stopped answering", lost_sub: "Unplug it and plug it in again.",
     idle: "No speaker connected", idle_sub_saved: "Switch the speaker on: BlueBird calls it every few seconds, or press Connect below.",
@@ -201,10 +203,10 @@ const I18N = {
     speaker: "Caixa de som", disconnect: "Desconectar", tone: "Tom de teste", volume: "Volume",
     search: "Achar uma caixa", scan: "Procurar", scanning: "Procurando…",
     search_hint: "Coloque a caixa em modo de pareamento (normalmente: segure o botão Bluetooth até a luz piscar rápido) e procure.",
-    show_others: "Mostrar aparelhos que não são caixas", saved: "Caixas salvas", auto: "Reconectar sozinho a última caixa",
+    show_others: "Mostrar aparelhos que não são caixas", saved: "Dispositivos salvos", auto: "Reconectar sozinho a última caixa",
     adapter: "Adaptador Bluetooth", prefer: "Usar", any: "Qualquer adaptador", diagnostics: "Diagnóstico",
     copy: "Copiar diagnóstico", reload_log: "Recarregar log", connect: "Conectar", forget: "Esquecer",
-    none_found: "Nada encontrado ainda.", none_saved: "Nenhuma caixa salva ainda. Procure uma acima.",
+    none_found: "Nada encontrado ainda.", none_saved: "Nenhum dispositivo salvo ainda. Procure um acima.",
     no_adapter: "Plugue um adaptador Bluetooth USB no PS5", no_adapter_sub: "O BlueBird nunca usa o Bluetooth do console: ele fica com o DualSense.",
     starting: "Ligando o adaptador…", lost: "O adaptador parou de responder", lost_sub: "Tire e plugue de novo.",
     idle: "Nenhuma caixa conectada", idle_sub_saved: "Ligue a caixa: o BlueBird chama ela a cada poucos segundos, ou toque em Conectar abaixo.",
@@ -230,10 +232,10 @@ const I18N = {
     speaker: "Altavoz", disconnect: "Desconectar", tone: "Tono de prueba", volume: "Volumen",
     search: "Buscar un altavoz", scan: "Buscar", scanning: "Buscando…",
     search_hint: "Pon el altavoz en modo de emparejamiento (normalmente: mantén su botón Bluetooth hasta que la luz parpadee rápido) y busca.",
-    show_others: "Mostrar dispositivos que no son altavoces", saved: "Altavoces guardados", auto: "Reconectar solo el último altavoz",
+    show_others: "Mostrar dispositivos que no son altavoces", saved: "Dispositivos guardados", auto: "Reconectar solo el último altavoz",
     adapter: "Adaptador Bluetooth", prefer: "Usar", any: "Cualquier adaptador", diagnostics: "Diagnóstico",
     copy: "Copiar diagnóstico", reload_log: "Recargar registro", connect: "Conectar", forget: "Olvidar",
-    none_found: "Todavía no se encontró nada.", none_saved: "Aún no hay altavoces guardados. Busca uno arriba.",
+    none_found: "Todavía no se encontró nada.", none_saved: "Aún no hay dispositivos guardados. Busca uno arriba.",
     no_adapter: "Conecta un adaptador Bluetooth USB a la PS5", no_adapter_sub: "BlueBird nunca usa el Bluetooth de la consola: lo conserva el DualSense.",
     starting: "Iniciando el adaptador…", lost: "El adaptador dejó de responder", lost_sub: "Desconéctalo y vuelve a conectarlo.",
     idle: "Ningún altavoz conectado", idle_sub_saved: "Enciende el altavoz: BlueBird lo llama cada pocos segundos, o pulsa Conectar abajo.",
@@ -259,10 +261,10 @@ const I18N = {
     speaker: "Enceinte", disconnect: "Déconnecter", tone: "Son de test", volume: "Volume",
     search: "Trouver une enceinte", scan: "Rechercher", scanning: "Recherche…",
     search_hint: "Mettez l'enceinte en mode d'appairage (en général : maintenez son bouton Bluetooth jusqu'à ce que le voyant clignote vite), puis lancez la recherche.",
-    show_others: "Afficher les appareils qui ne sont pas des enceintes", saved: "Enceintes enregistrées", auto: "Reconnecter seul la dernière enceinte",
+    show_others: "Afficher les appareils qui ne sont pas des enceintes", saved: "Appareils enregistrés", auto: "Reconnecter seul la dernière enceinte",
     adapter: "Adaptateur Bluetooth", prefer: "Utiliser", any: "N'importe quel adaptateur", diagnostics: "Diagnostic",
     copy: "Copier le diagnostic", reload_log: "Recharger le journal", connect: "Connecter", forget: "Oublier",
-    none_found: "Rien trouvé pour l'instant.", none_saved: "Aucune enceinte enregistrée. Recherchez-en une ci-dessus.",
+    none_found: "Rien trouvé pour l'instant.", none_saved: "Aucun appareil enregistré. Recherchez-en un ci-dessus.",
     no_adapter: "Branchez un adaptateur Bluetooth USB sur la PS5", no_adapter_sub: "BlueBird n'utilise jamais le Bluetooth de la console : la DualSense le garde.",
     starting: "Démarrage de l'adaptateur…", lost: "L'adaptateur ne répond plus", lost_sub: "Débranchez-le puis rebranchez-le.",
     idle: "Aucune enceinte connectée", idle_sub_saved: "Allumez l'enceinte : BlueBird l'appelle toutes les quelques secondes, ou appuyez sur Connecter ci-dessous.",
@@ -288,10 +290,10 @@ const I18N = {
     speaker: "Lautsprecher", disconnect: "Trennen", tone: "Testton", volume: "Lautstärke",
     search: "Lautsprecher finden", scan: "Suchen", scanning: "Suche läuft…",
     search_hint: "Versetze den Lautsprecher in den Kopplungsmodus (meist: Bluetooth-Taste halten, bis das Licht schnell blinkt) und suche dann.",
-    show_others: "Geräte zeigen, die keine Lautsprecher sind", saved: "Gespeicherte Lautsprecher", auto: "Letzten Lautsprecher automatisch verbinden",
+    show_others: "Geräte zeigen, die keine Lautsprecher sind", saved: "Gespeicherte Geräte", auto: "Letzten Lautsprecher automatisch verbinden",
     adapter: "Bluetooth-Adapter", prefer: "Verwenden", any: "Beliebiger Adapter", diagnostics: "Diagnose",
     copy: "Diagnose kopieren", reload_log: "Protokoll neu laden", connect: "Verbinden", forget: "Entfernen",
-    none_found: "Noch nichts gefunden.", none_saved: "Noch kein Lautsprecher gespeichert. Suche oben nach einem.",
+    none_found: "Noch nichts gefunden.", none_saved: "Noch kein Gerät gespeichert. Suche oben nach einem.",
     no_adapter: "Stecke einen USB-Bluetooth-Adapter in die PS5", no_adapter_sub: "BlueBird nutzt nie das Bluetooth der Konsole: Es bleibt beim DualSense.",
     starting: "Adapter wird gestartet…", lost: "Der Adapter antwortet nicht mehr", lost_sub: "Abziehen und wieder einstecken.",
     idle: "Kein Lautsprecher verbunden", idle_sub_saved: "Schalte den Lautsprecher ein: BlueBird ruft ihn alle paar Sekunden, oder tippe unten auf Verbinden.",
@@ -317,10 +319,10 @@ const I18N = {
     speaker: "Колонка", disconnect: "Отключить", tone: "Тестовый сигнал", volume: "Громкость",
     search: "Найти колонку", scan: "Поиск", scanning: "Идёт поиск…",
     search_hint: "Переведите колонку в режим сопряжения (обычно: удерживайте кнопку Bluetooth, пока индикатор не начнёт быстро мигать) и начните поиск.",
-    show_others: "Показывать устройства, которые не являются колонками", saved: "Сохранённые колонки", auto: "Подключать последнюю колонку автоматически",
+    show_others: "Показывать устройства, которые не являются колонками", saved: "Сохранённые устройства", auto: "Подключать последнюю колонку автоматически",
     adapter: "Bluetooth-адаптер", prefer: "Использовать", any: "Любой адаптер", diagnostics: "Диагностика",
     copy: "Копировать диагностику", reload_log: "Обновить журнал", connect: "Подключить", forget: "Забыть",
-    none_found: "Пока ничего не найдено.", none_saved: "Сохранённых колонок пока нет. Найдите колонку выше.",
+    none_found: "Пока ничего не найдено.", none_saved: "Сохранённых устройств пока нет. Найдите устройство выше.",
     no_adapter: "Подключите USB-адаптер Bluetooth к PS5", no_adapter_sub: "BlueBird никогда не использует Bluetooth консоли: он остаётся у DualSense.",
     starting: "Запуск адаптера…", lost: "Адаптер перестал отвечать", lost_sub: "Отключите и подключите его снова.",
     idle: "Колонка не подключена", idle_sub_saved: "Включите колонку: BlueBird вызывает её каждые несколько секунд, или нажмите «Подключить» ниже.",
@@ -346,10 +348,10 @@ const I18N = {
     speaker: "スピーカー", disconnect: "切断", tone: "テスト音", volume: "音量",
     search: "スピーカーを探す", scan: "検索", scanning: "検索中…",
     search_hint: "スピーカーをペアリングモードにしてから検索してください(通常は Bluetooth ボタンをランプが速く点滅するまで長押し)。",
-    show_others: "スピーカー以外の機器も表示", saved: "保存済みのスピーカー", auto: "前回のスピーカーに自動で再接続",
+    show_others: "スピーカー以外の機器も表示", saved: "保存済みのデバイス", auto: "前回のスピーカーに自動で再接続",
     adapter: "Bluetooth アダプター", prefer: "使用", any: "どのアダプターでも", diagnostics: "診断",
     copy: "診断をコピー", reload_log: "ログを再読み込み", connect: "接続", forget: "削除",
-    none_found: "まだ見つかりません。", none_saved: "保存済みのスピーカーはありません。上で検索してください。",
+    none_found: "まだ見つかりません。", none_saved: "保存済みのデバイスはありません。上で検索してください。",
     no_adapter: "PS5 に USB Bluetooth アダプターを接続してください", no_adapter_sub: "BlueBird は本体の Bluetooth を使いません。DualSense がそのまま使います。",
     starting: "アダプターを起動中…", lost: "アダプターが応答しません", lost_sub: "抜いてから挿し直してください。",
     idle: "スピーカー未接続", idle_sub_saved: "スピーカーの電源を入れてください。BlueBird が数秒ごとに呼び出します。下の「接続」でも接続できます。",
@@ -479,7 +481,7 @@ function renderFound(s) {
   setHtml(ul, list.map((f) =>
     '<li><span class="ico">' + (f.audio ? "♪" : "•") + '</span><div class="name"><b>' + esc(f.name || T("unnamed")) + "</b><small>" + esc(f.addr) +
     (f.rssi ? " · " + f.rssi + " dBm" : "") + "</small></div>" +
-    '<button class="primary" data-connect="' + esc(f.addr) + '">' + esc(T("connect")) + "</button></li>").join(""));
+    '<div class="acts"><button class="primary" data-connect="' + esc(f.addr) + '">' + esc(T("connect")) + "</button></div></li>").join(""));
 }
 
 function renderSaved(s) {
@@ -490,8 +492,8 @@ function renderSaved(s) {
     setHtml(ul, s.saved.map((p) => {
       const on = s.link.code > 0 && s.link.addr === p.addr;
       return '<li><span class="ico">♪</span><div class="name"><b>' + esc(p.name || T("unnamed")) + "</b><small>" + esc(p.addr) + "</small></div>" +
-        (on ? "" : '<button data-connect="' + esc(p.addr) + '">' + esc(T("connect")) + "</button>") +
-        '<button class="danger" data-forget="' + esc(p.addr) + '">' + esc(T("forget")) + "</button></li>";
+        '<div class="acts">' + (on ? "" : '<button data-connect="' + esc(p.addr) + '">' + esc(T("connect")) + "</button>") +
+        '<button class="danger" data-forget="' + esc(p.addr) + '">' + esc(T("forget")) + "</button></div></li>";
     }).join(""));
   }
   $("auto").checked = s.auto;
