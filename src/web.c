@@ -1,6 +1,5 @@
 #include "web.h"
 #include "speaker.h"
-#include "audio/stream.h"
 #include "ui_text.h"
 #include "version.h"
 #include "log.h"
@@ -204,12 +203,6 @@ static void handle(int fd)
     } else if (!strcmp(target, "/api/volume")) {
         int ok = query_get(query, "v", v, sizeof(v));
         if (ok) speaker_set_volume(atoi(v));
-        respond_ok(fd, ok);
-    } else if (!strcmp(target, "/api/probe")) {
-        respond_ok(fd, stream_probe_capture());
-    } else if (!strcmp(target, "/api/source")) {
-        int ok = query_get(query, "s", v, sizeof(v)) && v[0] >= '0' && v[0] <= '7' && !v[1];
-        if (ok) speaker_set_capture_source(v[0] - '0');
         respond_ok(fd, ok);
     } else if (!strcmp(target, "/api/tone")) {
         speaker_test_tone();
