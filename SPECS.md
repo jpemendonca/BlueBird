@@ -51,6 +51,7 @@ One link, one sink.
 - Pacing: one packet per packet duration (18.7 ms at bitpool 53 and MTU 895), at most 4 per turn; a stall over 200 ms restarts the clock.
 - Bitpool adaptation: packets dropped in a second lower the bitpool by 6, not below 29; 10 s without drops raise it by 2, up to the configured maximum.
 - Sink at 44.1 kHz: linear resampling from 48 kHz. Mono sink: L and R averaged.
+- The controller's speaker is not in the Remote Play mix: with BlueBird playing, the DualSense keeps its own sounds (PS5, 13 Nov). A headphone mode that brings them to the headset needs another capture source. `capture_probe` (Diagnostics, "Look for the controller audio") opens the capture with source values 0 to 7 for 1.5 s each and reports what each gives; source 2 is the Remote Play mix the stream uses.
 
 ## 5. Dashboard and API (`src/web.c`)
 

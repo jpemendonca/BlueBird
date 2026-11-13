@@ -1,6 +1,7 @@
 #include "speaker.h"
 #include "a2dp/host.h"
 #include "a2dp/store.h"
+#include "audio/capture.h"
 #include "audio/stream.h"
 #include "bt/usb_hci.h"
 #include "log.h"
@@ -495,8 +496,9 @@ void speaker_set_adapter(const char *prefer)
 
 int speaker_status_json(char *out, int n)
 {
-    char stream[512], adapters[512], name[140], err[200], chip[100];
+    char stream[512], adapters[512], name[140], err[200], chip[100], probe[1200];
     stream_status_json(stream, sizeof(stream));
+    capture_probe_json(probe, sizeof(probe));
     usb_hci_list_json(adapters, sizeof(adapters));
     store_entry_t saved[STORE_MAX];
     int nsaved = store_list(saved, STORE_MAX);
@@ -514,13 +516,13 @@ int speaker_status_json(char *out, int n)
         "\"adapters\":%s,"
         "\"link\":{\"state\":\"%s\",\"code\":%d,\"addr\":\"%s\",\"name\":\"%s\",\"incoming\":%s,\"error\":\"%s\","
         "\"mtu\":%d,\"media_sent\":%u,\"media_dropped\":%u},"
-        "\"stream\":%s,\"auto\":%s,\"scanning\":%s,\"found\":[",
+        "\"stream\":%s,\"probe\":%s,\"auto\":%s,\"scanning\":%s,\"found\":[",
         g_sp.bt_state, g_sp.have_adapter ? "true" : "false", g_sp.info.path, g_sp.info.vid, g_sp.info.pid, chip,
         g_sp.info.address, g_sp.info.firmware, g_sp.info.fake_csr ? "true" : "false", s.acl_mtu, s.acl_bufs, g_sp.prefer,
         adapters,
         host_state_name(s.state), s.state, s.state == HOST_IDLE ? "" : a, name, s.incoming ? "true" : "false", err,
         s.mtu, s.media_sent, s.media_dropped,
-        stream, g_sp.auto_on ? "true" : "false", g_sp.scanning ? "true" : "false");
+        stream, probe, g_sp.auto_on ? "true" : "false", g_sp.scanning ? "true" : "false");
     for (int i = 0; i < g_sp.nfound && len < n; i++) {
         char fname[140];
         json_str(fname, sizeof(fname), g_sp.found[i].name);

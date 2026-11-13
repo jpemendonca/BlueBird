@@ -24,7 +24,7 @@ Da próxima vez é só ligar a caixa. O BlueBird chama a última caixa sozinho.
 ## Sobre o som
 
 - A TV continua tocando também. Abaixe o volume na TV.
-- O alto-falante do controle continua funcionando, porque nada fica plugado no controle.
+- O alto-falante do controle continua funcionando, porque nada fica plugado no controle. Isso vale também para fones: o som que o jogo manda para o controle ainda sai pelo controle. Um modo fone, que leva esse som para o fone, está sendo estudado: em **Diagnóstico**, o botão **Procurar o áudio do controle** faz o teste.
 - O Bluetooth tem um atraso de uns 150 a 250 ms. Por isso o som do controle chega antes do som da caixa.
 
 ## Usando junto com o OmniPad

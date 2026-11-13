@@ -19,7 +19,7 @@ Play your PS5's game and system sound on a Bluetooth speaker or headphones, thro
 4. Open the **BlueBird** tile in the Media tab (or `http://<PS5_IP>:8120` on your phone).
 5. Put the speaker in pairing mode, press **Search**, then **Connect** next to it. "Playing on …" appears.
 
-The TV keeps its sound too: turn it down on the TV. The controller's own speaker keeps working, since nothing is plugged into the controller.
+The TV keeps its sound too: turn it down on the TV. The controller's own speaker keeps working, since nothing is plugged into the controller; with headphones, sounds the game sends to the controller still come from the controller. Diagnostics has an experiment, **Look for the controller audio**, to find that stream for a future headphone mode.
 
 ## Adapters
 

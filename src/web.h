@@ -11,6 +11,7 @@
  *   POST /api/forget?addr=AA:BB:..
  *   POST /api/volume?v=0..100
  *   POST /api/tone         a 3 s test tone on the speaker
+ *   POST /api/probe        try each capture source, to find the controller speaker's audio
  *   POST /api/auto?on=0|1  reconnect the last speaker by itself
  *   POST /api/adapter?prefer=vvvv:pppp   (empty for any) */
 

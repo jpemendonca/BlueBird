@@ -18,6 +18,13 @@ int  capture_read(int16_t *out, int max_frames);
 
 void capture_close(void);
 
+/* Closes the session and opens the capture once with each source value, measuring what comes,
+ * to find the controller speaker's stream. Takes about 12 s. Returns 1 if it ran. */
+int  capture_probe(void);
+
+/* The probe's results as JSON. Returns its length. */
+int  capture_probe_json(char *out, int n);
+
 /* What the last open or read said, for the dashboard */
 const char *capture_status(void);
 

@@ -3,81 +3,109 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1f6feb">
 <title>BlueBird</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f6feb'/%3E%3Cpath d='M14 38c6-14 22-22 36-16-6 2-9 6-10 10 6 0 10 3 12 8-10-4-22 2-30 8 2-4 2-7 0-10z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231f6feb'/%3E%3Cellipse cx='40' cy='58' rx='22' ry='18' fill='%23fff'/%3E%3Ccircle cx='55' cy='41' r='11' fill='%23fff'/%3E%3Cpath d='M64 38l10 4-10 4z' fill='%23ffc43d'/%3E%3Cpath d='M22 56L6 46l4 16z' fill='%23fff'/%3E%3C/svg%3E">
 <style>
 :root {
-  --bg: #0d1117; --card: #161b22; --edge: #30363d; --ink: #e6edf3; --mute: #8b949e;
-  --blue: #2f81f7; --blue-ink: #ffffff; --green: #3fb950; --amber: #d29922; --red: #f85149;
-  --chip: #21262d;
+  --bg: #071433; --bg2: #0b1d4a; --card: #102659; --card-edge: #1d3a7a; --ink: #f2f6ff; --mute: #9fb3dd;
+  --blue: #2f7bff; --blue-2: #1f5fe0; --sky: #58a6ff; --on-blue: #ffffff; --chip: #17306b;
+  --green: #3ddc84; --amber: #ffc43d; --red: #ff6b6b;
+  --hero-1: #2f7bff; --hero-2: #2347b8;
+  --shadow: 0 10px 30px rgba(0, 0, 0, .35);
 }
 @media (prefers-color-scheme: light) {
-  :root:not(.tv) { --bg: #f6f8fa; --card: #ffffff; --edge: #d0d7de; --ink: #1f2328; --mute: #59636e;
-    --blue: #0969da; --green: #1a7f37; --amber: #9a6700; --red: #cf222e; --chip: #eef1f4; }
+  :root:not(.tv) { --bg: #eaf1ff; --bg2: #dce8ff; --card: #ffffff; --card-edge: #cfdcf7; --ink: #0d1b3e; --mute: #4d628f;
+    --chip: #eef3ff; --green: #14a35a; --amber: #b07800; --red: #d63c3c; --shadow: 0 8px 24px rgba(31, 95, 224, .12); }
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-body { margin: 0; background: var(--bg); color: var(--ink);
-  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-main { max-width: 760px; margin: 0 auto; padding: 16px; }
-header { display: flex; align-items: center; gap: 12px; margin: 4px 0 16px; }
-header svg { width: 40px; height: 40px; flex: none; }
-header h1 { font-size: 1.4rem; margin: 0; }
+body { margin: 0; color: var(--ink); background: linear-gradient(180deg, var(--bg2), var(--bg) 340px) fixed, var(--bg);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; min-height: 100vh; }
+main { max-width: 780px; margin: 0 auto; padding: 16px; }
+header { display: flex; align-items: center; gap: 12px; margin: 6px 0 18px; }
+header svg { width: 44px; height: 44px; flex: none; filter: drop-shadow(0 4px 10px rgba(47, 123, 255, .5)); }
+header h1 { font-size: 1.5rem; margin: 0; letter-spacing: .01em; }
 header .ver { color: var(--mute); font-size: .85rem; margin-left: auto; }
-section { background: var(--card); border: 1px solid var(--edge); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
-h2 { font-size: 1rem; margin: 0 0 10px; color: var(--mute); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
-.status { display: flex; gap: 14px; align-items: flex-start; }
-.dot { width: 14px; height: 14px; border-radius: 50%; margin-top: 7px; flex: none; background: var(--mute); }
-.dot.ok { background: var(--green); } .dot.busy { background: var(--amber); animation: pulse 1s infinite; }
+section { background: var(--card); border: 1px solid var(--card-edge); border-radius: 18px; padding: 18px;
+  margin-bottom: 14px; box-shadow: var(--shadow); }
+h2 { font-size: .85rem; margin: 0 0 12px; color: var(--sky); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+section.hero { background: linear-gradient(135deg, var(--hero-1), var(--hero-2)); border: 0; color: #fff; position: relative; overflow: hidden; }
+section.hero::after { content: ""; position: absolute; right: -40px; top: -40px; width: 200px; height: 200px; border-radius: 50%;
+  border: 18px solid rgba(255, 255, 255, .08); box-shadow: 0 0 0 26px rgba(255, 255, 255, .05); pointer-events: none; }
+section.hero h2 { color: rgba(255, 255, 255, .8); }
+.status { display: flex; gap: 14px; align-items: flex-start; position: relative; z-index: 1; }
+.dot { width: 14px; height: 14px; border-radius: 50%; margin-top: 9px; flex: none; background: rgba(255, 255, 255, .45); }
+.dot.ok { background: var(--green); box-shadow: 0 0 0 6px rgba(61, 220, 132, .25); }
+.dot.busy { background: var(--amber); animation: pulse 1s infinite; }
 .dot.err { background: var(--red); }
 @keyframes pulse { 50% { opacity: .35; } }
-.big { font-size: 1.35rem; font-weight: 600; }
-.sub { color: var(--mute); margin-top: 2px; }
-.err-text { color: var(--red); margin-top: 6px; }
-.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
-button { font: inherit; border: 1px solid var(--edge); background: var(--chip); color: var(--ink);
-  border-radius: 8px; padding: 9px 16px; cursor: pointer; }
-button.primary { background: var(--blue); color: var(--blue-ink); border-color: var(--blue); }
+.big { font-size: 1.55rem; font-weight: 700; line-height: 1.2; }
+.sub { color: rgba(255, 255, 255, .85); margin-top: 4px; }
+.err-text { margin-top: 8px; background: rgba(0, 0, 0, .22); border-radius: 10px; padding: 8px 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; position: relative; z-index: 1; }
+button { font: inherit; font-weight: 600; border: 1px solid var(--card-edge); background: var(--chip); color: var(--ink);
+  border-radius: 12px; padding: 10px 18px; cursor: pointer; transition: transform .08s, filter .15s; }
+button:hover { filter: brightness(1.08); }
+button:active { transform: scale(.97); }
+button.primary { background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: var(--on-blue); border-color: transparent;
+  box-shadow: 0 6px 16px rgba(47, 123, 255, .35); }
 button.danger { color: var(--red); }
+button.light { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .3); color: #fff; }
 button:disabled { opacity: .5; cursor: default; }
-button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
-.vol { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
-.vol input { flex: 1; accent-color: var(--blue); }
-.vol span { min-width: 3.5em; text-align: right; color: var(--mute); }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+.vol { display: flex; align-items: center; gap: 12px; margin-top: 18px; position: relative; z-index: 1; }
+.vol input { flex: 1; accent-color: #fff; }
+.vol span { min-width: 3.5em; text-align: right; color: rgba(255, 255, 255, .85); }
 ul.list { list-style: none; margin: 0; padding: 0; }
-ul.list li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--edge); }
+ul.list li { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-top: 1px solid var(--card-edge); }
 ul.list li:first-child { border-top: 0; }
+ul.list .ico { width: 38px; height: 38px; border-radius: 12px; flex: none; display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #fff; font-size: 1.1rem; }
 ul.list .name { flex: 1; min-width: 0; }
 ul.list .name b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 ul.list .name small { color: var(--mute); }
 .empty { color: var(--mute); padding: 4px 0; }
-.hint { color: var(--mute); font-size: .92rem; margin: 8px 0 0; }
+.hint { color: var(--mute); font-size: .92rem; margin: 0; }
 label.toggle { display: flex; gap: 10px; align-items: center; margin-top: 12px; cursor: pointer; }
 label.toggle input { width: 20px; height: 20px; accent-color: var(--blue); }
-dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
 dl.kv dt { color: var(--mute); } dl.kv dd { margin: 0; overflow-wrap: anywhere; }
-select { font: inherit; background: var(--chip); color: var(--ink); border: 1px solid var(--edge); border-radius: 8px; padding: 8px; }
-details summary { cursor: pointer; color: var(--mute); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: 1rem; }
-pre { background: var(--bg); border: 1px solid var(--edge); border-radius: 8px; padding: 10px; max-height: 320px;
+select { font: inherit; background: var(--chip); color: var(--ink); border: 1px solid var(--card-edge); border-radius: 10px; padding: 8px; }
+details summary { cursor: pointer; color: var(--sky); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: .85rem; }
+h3 { font-size: 1rem; margin: 18px 0 6px; }
+table.probe { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: .9rem; }
+table.probe th, table.probe td { text-align: left; padding: 6px 8px; border-top: 1px solid var(--card-edge); }
+table.probe th { color: var(--mute); font-weight: 600; }
+.bar { height: 8px; border-radius: 4px; background: var(--chip); overflow: hidden; min-width: 60px; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--sky), var(--blue)); }
+pre { background: var(--bg); border: 1px solid var(--card-edge); border-radius: 12px; padding: 10px; max-height: 320px;
   overflow: auto; font-size: .78rem; white-space: pre-wrap; word-break: break-word; }
 .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: var(--bg);
-  padding: 10px 16px; border-radius: 8px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  padding: 10px 16px; border-radius: 12px; opacity: 0; transition: opacity .2s; pointer-events: none; font-weight: 600; }
 .toast.on { opacity: 1; }
 html.tv body { font-size: 22px; }
-html.tv main { max-width: 1100px; }
-html.tv button { padding: 14px 24px; }
-@media (max-width: 480px) { .big { font-size: 1.15rem; } section { padding: 14px; } }
+html.tv main { max-width: 1120px; }
+html.tv button { padding: 14px 26px; }
+@media (max-width: 480px) { .big { font-size: 1.25rem; } section { padding: 15px; border-radius: 16px; } }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#1f6feb"/><path d="M14 38c6-14 22-22 36-16-6 2-9 6-10 10 6 0 10 3 12 8-10-4-22 2-30 8 2-4 2-7 0-10z" fill="#fff"/></svg>
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f7bff"/><stop offset="1" stop-color="#2347b8"/></linearGradient></defs>
+      <rect width="100" height="100" rx="22" fill="url(#g)"/>
+      <ellipse cx="40" cy="58" rx="22" ry="18" fill="#fff"/><circle cx="55" cy="41" r="11" fill="#fff"/>
+      <path d="M64 38l10 4-10 4z" fill="#ffc43d"/><path d="M22 56L6 46l4 16z" fill="#fff"/>
+      <circle cx="58" cy="39" r="2" fill="#0d1b3e"/>
+      <path d="M78 34a14 14 0 0 1 0 16M84 28a22 22 0 0 1 0 28" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>
     <h1>BlueBird</h1>
     <span class="ver" id="ver"></span>
   </header>
 
-  <section aria-live="polite">
+  <section class="hero" aria-live="polite">
     <h2 data-t="speaker"></h2>
     <div class="status">
       <div class="dot" id="dot"></div>
@@ -88,8 +116,8 @@ html.tv button { padding: 14px 24px; }
       </div>
     </div>
     <div class="row" id="actions">
-      <button id="btn-disconnect" class="danger" data-t="disconnect" hidden></button>
-      <button id="btn-tone" data-t="tone" hidden></button>
+      <button id="btn-disconnect" class="light" data-t="disconnect" hidden></button>
+      <button id="btn-tone" class="light" data-t="tone" hidden></button>
     </div>
     <div class="vol">
       <label for="vol" data-t="volume"></label>
@@ -126,6 +154,10 @@ html.tv button { padding: 14px 24px; }
       <summary data-t="diagnostics"></summary>
       <dl class="kv" id="numbers" style="margin-top:12px"></dl>
       <div class="row"><button id="btn-copy" data-t="copy"></button><button id="btn-log" data-t="reload_log"></button></div>
+      <h3 data-t="probe_title"></h3>
+      <p class="hint" data-t="probe_hint"></p>
+      <div class="row"><button class="primary" id="btn-probe" data-t="probe_run"></button></div>
+      <div id="probe"></div>
       <pre id="log"></pre>
     </details>
   </section>
@@ -158,6 +190,10 @@ const I18N = {
     err_answer: "{n} did not answer. Check it is on, close by, and not connected to a phone.",
     err_pair: "Pairing failed. Put the speaker in pairing mode and press Connect again.",
     err_range: "The speaker went out of range.", unnamed: "(no name)", busy: "Not possible right now",
+    probe_title: "Controller speaker audio (experiment)",
+    probe_hint: "The sound a game sends to the controller's speaker is a stream of its own. This test looks for it: open a game that plays sound on the controller, keep it playing, and press the button. It takes about 15 s and the speaker goes quiet meanwhile. Then copy the diagnostics and send them.",
+    probe_run: "Look for the controller audio", probe_running: "Looking… (15 s)",
+    probe_source: "Source", probe_open: "Opened", probe_rate: "Data", probe_level: "Level", yes: "yes", no: "no",
   },
   pt: {
     speaker: "Caixa de som", disconnect: "Desconectar", tone: "Tom de teste", volume: "Volume",
@@ -182,6 +218,10 @@ const I18N = {
     err_answer: "{n} não respondeu. Veja se está ligada, perto e sem estar conectada a um celular.",
     err_pair: "O pareamento falhou. Coloque a caixa em modo de pareamento e toque em Conectar de novo.",
     err_range: "A caixa saiu do alcance.", unnamed: "(sem nome)", busy: "Não dá agora",
+    probe_title: "Áudio do controle (experimento)",
+    probe_hint: "O som que o jogo manda para o alto-falante do controle é um fluxo separado. Este teste procura onde ele está: abra um jogo que toca som no controle, deixe tocando e aperte o botão. Leva uns 15 s e a caixa fica muda nesse tempo. Depois copie o diagnóstico e me mande.",
+    probe_run: "Procurar o áudio do controle", probe_running: "Procurando… (15 s)",
+    probe_source: "Fonte", probe_open: "Abriu", probe_rate: "Dados", probe_level: "Nível", yes: "sim", no: "não",
   },
 };
 const params = new URLSearchParams(location.search);
@@ -283,7 +323,7 @@ function renderFound(s) {
     return;
   }
   setHtml(ul, list.map((f) =>
-    '<li><div class="name"><b>' + esc(f.name || T("unnamed")) + "</b><small>" + esc(f.addr) +
+    '<li><span class="ico">' + (f.audio ? "♪" : "•") + '</span><div class="name"><b>' + esc(f.name || T("unnamed")) + "</b><small>" + esc(f.addr) +
     (f.rssi ? " · " + f.rssi + " dBm" : "") + "</small></div>" +
     '<button class="primary" data-connect="' + esc(f.addr) + '">' + esc(T("connect")) + "</button></li>").join(""));
 }
@@ -295,7 +335,7 @@ function renderSaved(s) {
   } else {
     setHtml(ul, s.saved.map((p) => {
       const on = s.link.code > 0 && s.link.addr === p.addr;
-      return '<li><div class="name"><b>' + esc(p.name || T("unnamed")) + "</b><small>" + esc(p.addr) + "</small></div>" +
+      return '<li><span class="ico">♪</span><div class="name"><b>' + esc(p.name || T("unnamed")) + "</b><small>" + esc(p.addr) + "</small></div>" +
         (on ? "" : '<button data-connect="' + esc(p.addr) + '">' + esc(T("connect")) + "</button>") +
         '<button class="danger" data-forget="' + esc(p.addr) + '">' + esc(T("forget")) + "</button></li>";
     }).join(""));
@@ -336,6 +376,20 @@ function renderNumbers(s) {
   setHtml($("numbers"), rows.map((r) => "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>").join(""));
 }
 
+function renderProbe(s) {
+  const p = s.probe || { state: 0, sources: [] };
+  const btn = $("btn-probe");
+  btn.disabled = p.state === 1;
+  btn.textContent = p.state === 1 ? T("probe_running") : T("probe_run");
+  if (!p.sources.length) { setHtml($("probe"), ""); return; }
+  setHtml($("probe"), '<table class="probe"><tr><th>' + esc(T("probe_source")) + "</th><th>" + esc(T("probe_open")) +
+    "</th><th>" + esc(T("probe_rate")) + "</th><th>" + esc(T("probe_level")) + "</th></tr>" +
+    p.sources.map((r) => "<tr><td>" + r.source + (r.source === 2 ? " (Remote Play)" : "") + "</td><td>" +
+      esc(r.opened ? T("yes") : T("no") + " · " + r.result) + "</td><td>" + (r.opened ? Math.round(r.bytes_per_s / 1000) + " KB/s" : "—") +
+      "</td><td>" + (r.opened ? '<div class="bar"><i style="width:' + r.level + '%"></i></div>' + r.level + "%" : "—") +
+      "</td></tr>").join("") + "</table>");
+}
+
 async function refresh() {
   try {
     const r = await fetch("/api/state", { cache: "no-store" });
@@ -352,6 +406,7 @@ async function refresh() {
   renderSaved(state);
   renderAdapter(state);
   renderNumbers(state);
+  renderProbe(state);
 }
 
 async function loadLog() {
@@ -381,6 +436,7 @@ $("vol").oninput = (e) => { volumeTouched = Date.now(); $("vol-v").textContent =
 $("vol").onchange = (e) => { volumeTouched = Date.now(); post("/api/volume?v=" + e.target.value); };
 $("diag").ontoggle = () => { if ($("diag").open) loadLog(); };
 $("btn-log").onclick = loadLog;
+$("btn-probe").onclick = async () => { await post("/api/probe"); refresh(); };
 $("btn-copy").onclick = async () => {
   const log = await loadLog();
   const text = "BlueBird diagnostics\n```json\n" + JSON.stringify(state, null, 1) + "\n```\n```\n" +

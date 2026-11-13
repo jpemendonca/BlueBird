@@ -32,7 +32,7 @@ S = {
     "saved": [{"addr": "F4:4E:FD:12:34:56", "name": "JBL Flip 5", "paired": True}],
     "link": {"state": "idle", "code": 0, "addr": "", "name": "", "incoming": False, "error": "", "mtu": 0,
              "media_sent": 0, "media_dropped": 0},
-    "volume": 80, "link_since": 0, "target": None, "scan_until": 0,
+    "volume": 80, "link_since": 0, "target": None, "scan_until": 0, "probe_at": 0,
 }
 STATES = [(0, "idle"), (1, "calling"), (2, "pairing"), (4, "choosing codec"), (5, "opening stream"), (7, "streaming")]
 LOG = []
@@ -64,6 +64,20 @@ def tick():
                 S["saved"].insert(0, {"addr": t["addr"], "name": t["name"], "paired": True})
 
 
+def probe():
+    if not S["probe_at"]:
+        return {"state": 0, "sources": []}
+    if time.time() - S["probe_at"] < 4:
+        return {"state": 1, "sources": []}
+    rows = []
+    for src in range(8):
+        opened = src in (0, 1, 2, 3)
+        rows.append({"source": src, "opened": opened, "result": "opened" if opened else "OpenAudio failed 0x81950001",
+                     "bytes_per_s": [384000, 0, 384000, 96000][src] if opened else 0,
+                     "level": [41, 0, 38, 22][src] if opened else 0, "nonzero": 90, "format": "float32"})
+    return {"state": 2, "sources": rows}
+
+
 def state():
     with LOCK:
         tick()
@@ -79,7 +93,7 @@ def state():
                        "sent": sent, "dropped": 0, "late": 0, "underruns": 1, "skips": 0, "buffered_ms": 52,
                        "volume": S["volume"], "capture": "capturing (rights 0)" if streaming else "not started",
                        "capturing": streaming},
-            "auto": S["auto"], "scanning": S["scanning"], "found": S["found"], "saved": S["saved"],
+            "probe": probe(), "auto": S["auto"], "scanning": S["scanning"], "found": S["found"], "saved": S["saved"],
         }
 
 
@@ -131,6 +145,9 @@ class Handler(BaseHTTPRequestHandler):
                 S["volume"] = int(q.get("v", 100))
             elif u.path == "/api/auto":
                 S["auto"] = q.get("on") == "1"
+            elif u.path == "/api/probe":
+                S["probe_at"] = time.time()
+                log("capture: probe of 8 sources")
             elif u.path in ("/api/tone", "/api/adapter"):
                 pass
             else:

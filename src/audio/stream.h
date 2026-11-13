@@ -29,6 +29,9 @@ int  stream_wait_ms(int cap);
 /* Keeps the capture running (1) or lets it close after a while (0). */
 void stream_want_capture(int on);
 
+/* Runs the capture source probe (capture_probe) on the capture thread. Returns 0 if one runs. */
+int  stream_probe_capture(void);
+
 /* Volume 0..100, applied before encoding. */
 void stream_set_volume(int pct);
 int  stream_volume(void);
