@@ -3,6 +3,9 @@
 
 #include <stddef.h>
 
+/* Past this size the log file becomes <path>.old and starts over, so at most two of them are kept */
+#define LOG_MAX_BYTES (1024 * 1024)
+
 /* Opens (appends to) the log file. Every line also goes to stdout and the kernel log. */
 void log_init(const char *path);
 

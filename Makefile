@@ -37,6 +37,9 @@ test:
 	./$(BUILD)/test_host_sim
 	$(CC_HOST) $(HFLAGS) src/ui_text.c tests/test_ui_text.c -o $(BUILD)/test_ui_text
 	./$(BUILD)/test_ui_text
+	$(CC_HOST) $(HFLAGS) src/log.c tests/test_log.c -lpthread -o $(BUILD)/test_log
+	./$(BUILD)/test_log > $(BUILD)/test_log.out || (grep -E "FAIL|checks" $(BUILD)/test_log.out; false)
+	grep checks $(BUILD)/test_log.out
 	python3 tools/check_i18n.py
 
 clean:

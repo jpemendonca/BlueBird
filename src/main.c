@@ -30,7 +30,6 @@
 #define LOG_PATH  STATE_DIR "/bluebird.log"
 #define STOP_FLAG STATE_DIR "/stop"
 #define PID_FILE  STATE_DIR "/bluebird.pid"
-#define LOG_KEEP  (512 * 1024)
 #define GAP_MS    3000
 
 static volatile sig_atomic_t g_running = 1;
@@ -118,11 +117,12 @@ static void replace_running_copy(void)
     }
 }
 
-/* The log is kept across runs for the dashboard; a long one starts over */
+/* The log is kept across runs for the dashboard; a long one starts over (log.c does the same
+ * while running) */
 static void trim_log(void)
 {
     struct stat st;
-    if (stat(LOG_PATH, &st) == 0 && st.st_size > LOG_KEEP) {
+    if (stat(LOG_PATH, &st) == 0 && st.st_size > LOG_MAX_BYTES) {
         char old[64];
         snprintf(old, sizeof(old), "%s.old", LOG_PATH);
         rename(LOG_PATH, old);

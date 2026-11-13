@@ -25,6 +25,7 @@ extern int sceKernelSendNotificationRequest(int, notify_request_t *, size_t, int
 #endif
 
 static FILE *g_log_file = NULL;
+static char g_log_path[200];
 static int g_log_fd = -1;                 /* the same file, for the crash handler */
 static pthread_mutex_t g_log_mutex = PTHREAD_MUTEX_INITIALIZER;
 static __thread const char *t_name;
@@ -35,6 +36,7 @@ void log_init(const char *path)
 {
     pthread_mutex_lock(&g_log_mutex);
     if (g_log_file) fclose(g_log_file);
+    snprintf(g_log_path, sizeof(g_log_path), "%s", path);
     g_log_file = fopen(path, "a");
     g_log_fd = g_log_file ? fileno(g_log_file) : -1;
     pthread_mutex_unlock(&g_log_mutex);
@@ -72,6 +74,14 @@ void log_line(const char *fmt, ...)
     if (g_log_file) {
         fputs(line, g_log_file);
         fflush(g_log_file);
+        if (ftell(g_log_file) > LOG_MAX_BYTES) {
+            char old[220];
+            snprintf(old, sizeof(old), "%s.old", g_log_path);
+            fclose(g_log_file);
+            rename(g_log_path, old);
+            g_log_file = fopen(g_log_path, "a");
+            g_log_fd = g_log_file ? fileno(g_log_file) : -1;
+        }
     }
     pthread_mutex_unlock(&g_log_mutex);
 #ifdef __PROSPERO__
