@@ -96,4 +96,4 @@ The payload is `dist/BlueBird.elf`. To work on the dashboard without a PS5, run 
 
 ## Credits and licence
 
-GPL-3.0-or-later. The USB adapter transport and the Realtek loader come from [OmniPad CE](https://github.com/jpemendonca/OmniPad-CE); the SBC encoder, the audio capture calls and the idea of the tile's offline page from [HearBridge-PS5](https://github.com/X-F1REBALL-X/HearBridge-PS5) by X-F1REBALL-X. The Realtek firmware is from linux-firmware. See [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md).
+GPL-3.0-or-later. The USB adapter transport and the Realtek loader come from [OmniPad CE](https://github.com/jpemendonca/OmniPad-CE); The Realtek firmware is from linux-firmware. See [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md).
